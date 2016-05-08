@@ -139,7 +139,7 @@ int main(void)
 			
 			if(Time500ms_Flag)
 			{
-				//Threshold_RTC_TimeShow();
+			  Threshold_RTC_TimeShow();
 				Time500ms_Flag = 0;
 			}
 			

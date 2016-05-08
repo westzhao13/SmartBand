@@ -90,18 +90,32 @@ uint8_t BSP_Init(void)
     Threshold_SystemClock_Config(System_32Mhz);
 	
 	Threshold_UART_Init(115200);//串口初始化
+	printf("SmartBand_v2.0------------by westzhao \r\n");
 	
 	OLED_Init(); //OLED初始化
+	printf("OELD Init success! \r\n");
 	MenuInit();  //menu初始化
-	
+	printf("UI Init success! \r\n");
 	//LED灯初始化
     Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_5,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_VERY_HIGH);
 	//RTC初始化
 	Threshold_RTC_Init(0x16,0x02,0x018,0x4,0x19,0x04,0x00);
+	printf("RTC Init success! \r\n");
+	
 	//i2c
-	Threshold_GpioI2C_Init();
+	#if defined(Gpio_I2C)
+	
+		Threshold_GpioI2C_Init();
+		printf("Sowftware I2C Load Success! \r\n");
+	
+	#elif defined(Hardware_I2C)
+	
+		Threshold_I2C_Init();
+		//printf("Hardware I2C Load Success! \n");
+	
+	#endif
 	//mma9553l
-	pedometer_init();
+	MMA9553L_Init();
 	
 	return 1;
 }
