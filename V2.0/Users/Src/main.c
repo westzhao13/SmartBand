@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    SmartBand_v1.0/Src/main.c 
+  * @file    SmartBand_v2.0/Src/main.c 
   * @author  ZhaoXiang
   * @version V1.0.0
   * @date    30-December-2015
@@ -57,16 +57,17 @@ osSemaphoreId osSemaphore;
 xSemaphoreHandle xSemaphore;
 
 /* Private function prototypes -----------------------------------------------*/
-static void vHandleTask(void * pvParameters);
-void Task1(void * pvParameters);
-void Task2(void * pvParameters);
-void Task3(void * pvParameters);
+static void Key_Action(void * pvParameters);
+void Menu_Thread(void * pvParameters);
+void RTC_Thread(void * pvParameters);
+void MotionSenser_Thread(void * pvParameters);
 
 /**
   * @brief  Main program
   * @param  None
   * @retval None
   */
+  uint8_t Rxdata;
 int main(void)
 {
 
@@ -91,13 +92,13 @@ int main(void)
 	vSemaphoreCreateBinary( xSemaphore );
 
 	//任务的创建
-	xTaskCreate( vHandleTask, "HandleTask", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+3, NULL );
+	xTaskCreate( Key_Action, "Key_Action", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+3, NULL );
 	
-	xTaskCreate( Task1, "Task1", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+2, NULL );
+	xTaskCreate( Menu_Thread, "Menu_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+2, NULL );
 	
-	xTaskCreate( Task3, "Task3", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal, NULL );
+	xTaskCreate( MotionSenser_Thread, "MotionSenser_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal, NULL );
 	
-  	xTaskCreate( Task2, "Task2", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+1, NULL );
+  	xTaskCreate( RTC_Thread, "RTC_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+1, NULL );
    
 	/* Start scheduler */
     vTaskStartScheduler();//osKernelStart();
@@ -110,15 +111,23 @@ int main(void)
 
 	
 #else
+
 	    HAL_Init();
 		HAL_Delay(500);
 		Threshold_Drivers_Load(); //Load Threshold Drivers
-
+			
 		while (1)
 		{	
 			if(Time20ms_Flag)
 			{
 				Menu(DisPlayRTC,DisPlayStep,DisPlayHeartBeat,DisPlayTimeFigure,DisPlayAuthor);
+				//MPU_Get_Gyroscope();
+				//MPU_Get_Accelerometer();
+				//GyroData.x = (MPU_Read_Byte(MPU_GYRO_XOUTH_REG) << 8) + MPU_Read_Byte(MPU_GYRO_XOUTL_REG);
+				//GyroData.y = (MPU_Read_Byte(MPU_GYRO_YOUTH_REG) << 8) + MPU_Read_Byte(MPU_GYRO_YOUTL_REG);
+				//GyroData.z = (MPU_Read_Byte(MPU_GYRO_ZOUTH_REG) << 8) + MPU_Read_Byte(MPU_GYRO_ZOUTL_REG);
+				//Data_Send_Senser(GyroData.x,GyroData.y,GyroData.z,AccData.x,AccData.y,AccData.z,0);
+				Threshold_BlE_Deal();
 				Time20ms_Flag = 0;
 			}
 			
@@ -130,17 +139,20 @@ int main(void)
 			
 			if(Time500ms_Flag)
 			{
-				Threshold_RTC_TimeShow();
+				//Threshold_RTC_TimeShow();
 				Time500ms_Flag = 0;
-			}	
+			}
+			
+		 
+			
 		}
 #endif
 }
 
 //任务1
-void Task1(void * pvParameters)
+void Menu_Thread(void * pvParameters)
 {
-	const char *pcPrint = "This is Task1 \r\n";
+	const char *pcPrint = "This is Menu_Thread \r\n";
 	//准确的时间延时，用于周期运行
 	portTickType xLastWakeTime;
 	/*初始化xLastWakeTime,之后会在vTaskDelayUntil()中更新*/
@@ -156,9 +168,9 @@ void Task1(void * pvParameters)
 }
 
 //任务2
-void Task2(void * pvParameters)
+void RTC_Thread(void * pvParameters)
 {
-	const char *pcPrint = "This is Task2 \r\n";
+	const char *pcPrint = "This is RTC_Thread \r\n";
 	//准确的时间延时，用于周期运行
 	portTickType xLastWakeTime;
 	/*初始化xLastWakeTime,之后会在vTaskDelayUntil()中更新*/
@@ -174,9 +186,9 @@ void Task2(void * pvParameters)
 }
 
 //任务3
-void Task3(void * pvParameters)
+void MotionSenser_Thread(void * pvParameters)
 {
-	const char *pcPrint = "This is Task3 \r\n";
+	const char *pcPrint = "This is MotionSenser_Thread \r\n";
 	//准确的时间延时，用于周期运行
 	portTickType xLastWakeTime;
 	/*初始化xLastWakeTime,之后会在vTaskDelayUntil()中更新*/
@@ -196,14 +208,14 @@ void Task3(void * pvParameters)
   * @param  argument: 延时处理的任务(阻塞的任务)，当收到信号量以后，解除阻塞，并且进行上下文的切换，使该任务的优先级达到最高并运行之。
   * @retval None
   */
-static void vHandleTask(void * pvParameters)
+static void Key_Action(void * pvParameters)
 {
   for (;;)
   {
 
 	  xSemaphoreTake( xSemaphore, portMAX_DELAY );
 	  key = Press;
-	  printf("Handle Task \r\n");
+	  printf("Key_Action Task \r\n");
 		
 		//直接调用以下函数即可。
 		/*

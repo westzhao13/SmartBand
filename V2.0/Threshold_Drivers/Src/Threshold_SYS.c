@@ -21,41 +21,63 @@ static void Error_Handler(void);
 {
 	Threshold_USE = 1;
 	/* Configure the System clock to have a frequency of 2 MHz (Up to 32MHZ possible) */
-  Threshold_SystemClock_Config(System_16Mhz);
+  	Threshold_SystemClock_Config(System_16Mhz);
 
 	Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_5,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 	
 	//uart
-	Threshold_Uart1_DMA_Init(115200);
-	printf("SmartBand_v1.0------------by westzhao \n");
+	Threshold_UART_Init(115200);
+	printf("SmartBand_v2.0------------by westzhao \r\n");
 	
 	//i2c
-	Threshold_GpioI2C_Init();
-	printf("I2C Load Success! \n");
+	#if defined(Gpio_I2C)
 	
-	//mma9553l
-  pedometer_init();
-	printf("MMA9553L Init Success! \n");
+		Threshold_GpioI2C_Init();
+		printf("Sowftware I2C Load Success! \r\n");
+	
+	#elif defined(Hardware_I2C)
+	
+		Threshold_I2C_Init();
+		//printf("Hardware I2C Load Success! \n");
+	
+	#endif
+
+	#if 1
+	MMA9553L_Init();
+	#endif
+	
+	#if 0
+	if(true == MPU6050Init())
+	{
+		
+printf("MPU6050 Init Success! \r\n");
+	}
+	else
+	{
+		
+printf("MPU6050 Init Failed! \r\n");
+	}
+	#endif
 	
 	//menu
 	MenuInit();
-	printf("UI Load Success! \n");
+	printf("UI Load Success! \r\n");
 	
-  //rtc
+  	//rtc
 	Threshold_RTC_Init(0x16,0x02,0x09,0x2,0x14,0x13,0x00);
-	printf("RTC Load Success! \n");
+	printf("RTC Load Success! \r\n");
 	
 	//oled
 	OLED_Init();
-	printf("OLED Load Success! \n");
+	printf("OLED Load Success! \r\n");
 	
 	//adc
-	Threshold_ADC_Init();
-	printf("ADC Init Success! \n");
+	//Threshold_ADC_Init();
+	//printf("ADC Init Success! \n");
 	
-	/* Timerbase Init in 2ms*/
-  Threshold_TIM6_Init(10); //10ms
-	printf("Timer Load Success! \n");
+	/* Timerbase Init in 10ms*/
+  	Threshold_TIM6_Init(10); //10ms
+	printf("Timer Load Success! \r\n");
 	
 	return 1;
 }
@@ -67,7 +89,7 @@ uint8_t BSP_Init(void)
   /* Configure the System clock to 32 MHz */
     Threshold_SystemClock_Config(System_32Mhz);
 	
-	Threshold_Uart1_DMA_Init(115200);//串口初始化
+	Threshold_UART_Init(115200);//串口初始化
 	
 	OLED_Init(); //OLED初始化
 	MenuInit();  //menu初始化
@@ -245,3 +267,5 @@ static void Error_Handler(void)
   {
   }
 }
+
+

@@ -74,5 +74,19 @@ extern int IBI;
 extern uint8_t key;
 
 extern ADC_HandleTypeDef    AdcHandle;
+extern __IO ITStatus UartReady;
+
+
+extern uint8_t SetTime;
+extern uint8_t SendMMA9553L_Data;
+extern uint8_t SendPulse_Data;
+extern uint8_t SendSysInfo;
+
+extern uint8_t TimeBuffer[20];
+extern uint8_t SetTimeOK;
+
 
 #endif
+
+
+

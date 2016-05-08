@@ -222,13 +222,13 @@
 void OLED_GPIO_Init(void)
 {
 	//SCL
-		Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_15,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_6,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 	//SDA
-		Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_1,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_7,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 	//RST
-		Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_4,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_4,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 	//DC
-		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_0,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_5,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 }
 
 
@@ -342,11 +342,11 @@ void OLED_Init(void)
 		
 		OLED_GPIO_Init();
 	
-    OLED_SCL_Low(); 	
+	    OLED_SCL_Low(); 	
 
-    OLED_RST_Low();
-    OLED_Delay_ms(50);
-    OLED_RST_High();
+	    OLED_RST_Low();
+	    OLED_Delay_ms(50);
+	    OLED_RST_High();
 	
 		OLED_WrCmd(0xAE);  // Display Off (0x00)
 
@@ -365,7 +365,7 @@ void OLED_Init(void)
 		OLED_WrCmd(0x14); // Enable Embedded DC/DC Converter (0x00/0x04)
 
 		OLED_WrCmd(0x20);
-    OLED_WrCmd(0x02);		     // Set Page Addressing Mode (0x00/0x01/0x02)
+   		OLED_WrCmd(0x02);		     // Set Page Addressing Mode (0x00/0x01/0x02)
 		
 		OLED_WrCmd(0xA1);// Set SEG/Column Mapping     0x00???? 0x01??
 
@@ -390,8 +390,8 @@ void OLED_Init(void)
 		OLED_Clear();
 
 		OLED_WrCmd(0xAF);// Display On (0x01)
-    OLED_Clear();                //????
-    OLED_Set_XY(0,0); 
+	    OLED_Clear();                //????
+	    OLED_Set_XY(0,0); 
 }
 /********************************* End of Internal Command ***************************************/
    

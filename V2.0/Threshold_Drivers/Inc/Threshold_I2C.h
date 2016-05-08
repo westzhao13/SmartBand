@@ -5,10 +5,12 @@
 #include "main.h"
 
 
-//#define Hardware_I2C
-#define Gpio_I2C
+#define Hardware_I2C
+//#define Gpio_I2C
 
 #define Slave_ADDRESS  MPU_ADDR
+//#define Slave_ADDRESS MMA9553_Slave_Addr
+
 
 /* Timing samples with SYSCLK 32MHz set in SystemClock_Config() */ 
 #define I2C_TIMING_100KHZ       0x10A13E56 /* Analog Filter ON, Rise Time 400ns, Fall Time 100ns */ 
@@ -34,9 +36,14 @@
 
 
 uint8_t Threshold_I2C_Init(void);
-void Threshold_I2C_MasterSendByte(uint8_t address,uint8_t *data);
+void Threshold_I2C_MasterSendOneByte(uint8_t dev_address,uint8_t mem_address,uint8_t *data);
+void Threshold_I2C_MasterSendBytes(uint8_t dev_address,uint8_t mem_address,uint8_t *data,uint8_t len);
 void Threshold_I2C_Wait(void);
-void Threshold_I2C_MasterRecvByte(uint8_t address,uint8_t *data);
-void Threshold_I2C_MasterRecvLen(uint8_t address,uint8_t len,uint8_t *buf);
+void Threshold_I2C_MasterRecvOneByte(uint8_t dev_address,uint8_t mem_address,uint8_t *data);
+void Threshold_I2C_MasterRecvBytes(uint8_t dev_address,uint8_t mem_address,uint8_t *data,uint8_t len);
+
 
 #endif
+
+
+

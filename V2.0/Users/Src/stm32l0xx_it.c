@@ -29,10 +29,29 @@
 #include "stm32l0xx_it.h"
 #include "cmsis_os.h"
 /* Private typedef -----------------------------------------------------------*/
+
+
 /* Private define ------------------------------------------------------------*/
+
+
+
+
 /* Private macro -------------------------------------------------------------*/
+uint8_t SetTime;
+uint8_t SendMMA9553L_Data;
+uint8_t SendPulse_Data;
+uint8_t SendSysInfo;
+
+uint8_t TimeBuffer[20];
+uint8_t SetTimeOK;
+
 /* Private function prototypes -----------------------------------------------*/
+
+
 /* Private functions ---------------------------------------------------------*/
+
+
+
 
 /******************************************************************************/
 /*            Cortex-M0+ Processor Exceptions Handlers                         */
@@ -135,9 +154,9 @@ void SysTick_Handler(void)
 {
 }*/
 #if (USE_FreeRTOS)
-	void EXTI4_15_IRQHandler(void)
+	//void EXTI4_15_IRQHandler(void)
 	{
-		HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
+		//HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
 	}
 	
 	void RTC_IRQHandler(void)
@@ -145,6 +164,61 @@ void SysTick_Handler(void)
 		HAL_RTCEx_TamperTimeStampIRQHandler(&RtcHandle);
 		//TamperStatus = SET;
 	}
+	void USART1_IRQHandler(void)                	//¡ä??¨²1?D??¡¤t??3¨¬D¨°
+	{
+		
+		uint8_t Res;
+		static uint8_t cnt = 0;
+	    HAL_UART_IRQHandler(&UartHandle);
+	    if(__HAL_UART_GET_IT(&UartHandle, UART_IT_RXNE) != RESET)  //
+	    {
+	          //USART1->RQR |= 0x00;//?? RXNE
+	          Res = USART1->RDR;//USARTx_RX_Data(&UartHandle);
+	          //printf("%d\r\n",Res);
+
+			  #if 1
+			  if(SetTime == false)
+			  {
+				  switch(Res)
+				  {
+				  	case time: {SetTime = 1;
+							   	printf("Reset Time ! \r\n");
+				  			   }
+						break;
+						
+					case mmadata: SendMMA9553L_Data = 1;
+						break; 
+						
+					case pulsedata: SendPulse_Data = 1;
+						break;
+						
+					case sysinfo: SendSysInfo = 1;
+						break;
+						
+					default: {SetTime = 0;SendMMA9553L_Data = 0;SendPulse_Data = 0;SendSysInfo = 0;}
+						break;
+				  }
+			  }
+			  else
+
+			  {
+				  	TimeBuffer[cnt] = Res;
+					if(cnt == 13)
+						SetTimeOK = true;
+					else
+						SetTimeOK = false;
+					
+					if(++cnt >= 14)
+						cnt = 0;
+			  }
+
+			  
+
+			  #endif
+			  
+		} 
+		HAL_NVIC_ClearPendingIRQ(USART2_IRQn);
+	}	
 #else
 	void TIM6_IRQHandler(void)
 	{
@@ -154,17 +228,6 @@ void SysTick_Handler(void)
 	{
 		HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
 	}
-
-	void USARTx_DMA_RX_IRQHandler(void)
-	{
-		HAL_DMA_IRQHandler(UartHandle.hdmatx);
-		HAL_DMA_IRQHandler(UartHandle.hdmarx);
-	}
-
-	void USARTx_IRQHandler(void)
-	{
-		HAL_UART_IRQHandler(&UartHandle);
-	}
 	
 	void RTC_IRQHandler(void)
 	{
@@ -172,5 +235,65 @@ void SysTick_Handler(void)
 		//TamperStatus = SET;
 	}
 
+	void USART1_IRQHandler(void)                	//¡ä??¨²1?D??¡¤t??3¨¬D¨°
+	{
+		
+		uint8_t Res;
+		static uint8_t cnt = 0;
+	    HAL_UART_IRQHandler(&UartHandle);
+	    if(__HAL_UART_GET_IT(&UartHandle, UART_IT_RXNE) != RESET)  //
+	    {
+	          //USART1->RQR |= 0x00;//?? RXNE
+	          Res = USART1->RDR;//USARTx_RX_Data(&UartHandle);
+	          //printf("%d\r\n",Res);
+
+			  #if 1
+			  if(SetTime == false)
+			  {
+				  switch(Res)
+				  {
+				  	case time: {SetTime = 1;
+							   	printf("Reset Time ! \r\n");
+				  			   }
+						break;
+						
+					case mmadata: SendMMA9553L_Data = 1;
+						break; 
+						
+					case pulsedata: SendPulse_Data = 1;
+						break;
+						
+					case sysinfo: SendSysInfo = 1;
+						break;
+						
+					default: {SetTime = 0;SendMMA9553L_Data = 0;SendPulse_Data = 0;SendSysInfo = 0;}
+						break;
+				  }
+			  }
+			  else
+
+			  {
+				  	TimeBuffer[cnt] = Res;
+					if(cnt == 13)
+						SetTimeOK = true;
+					else
+						SetTimeOK = false;
+					
+					if(++cnt >= 14)
+						cnt = 0;
+			  }
+
+			  
+
+			  #endif
+			  
+		} 
+		HAL_NVIC_ClearPendingIRQ(USART1_IRQn);
+	}	
+
 #endif
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
+
+
+

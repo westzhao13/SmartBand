@@ -65,10 +65,31 @@
 #include <string.h>
 
 
-#define true  1
-#define false 0
+#define true  (1)
+#define false (0)
 
-#define USE_FreeRTOS 1
+#define USE_FreeRTOS (0)
+
+#define printf   printf
+
+#define uint8_t  uint8_t
+#define uint16_t uint16_t
+#define uint32_t uint32_t
+#define int8_t   int8_t
+#define int16_t  int16_t
+#define int32_t  int32_t 
+
+
+typedef enum
+{
+	time = 'A', 
+	mmadata,
+	pulsedata,
+	sysinfo
+}BLE_InfoTypeEnum;
+
+
+#define SetTimeNUM 7
 
 /* Exported types ------------------------------------------------------------*/
 
@@ -80,3 +101,4 @@
 #endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+

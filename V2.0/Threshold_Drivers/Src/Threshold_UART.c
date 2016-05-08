@@ -10,87 +10,10 @@
 	
 #include "Threshold_UART.h"
 /* private function decline */
-static void Error_Handler(void);
 
 UART_HandleTypeDef UartHandle;
 __IO ITStatus UartReady = RESET;
 
-/* UART handler declaration */
-uint8_t Threshold_Uart1_Init(uint32_t Baud) //defalut use USART1
-{
-	if(Threshold_USE)
-	{
-		/*##-1- Configure the UART peripheral ######################################*/
-		/* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-		/* UART1 configured as follow:
-				- Word Length = 8 Bits
-				- Stop Bit = One Stop bit
-				- Parity = None
-				- BaudRate = 115200 baud
-				- Hardware flow control disabled (RTS and CTS signals) */
-		UartHandle.Instance        = USART2;
-		UartHandle.Init.BaudRate   = Baud;
-		UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-		UartHandle.Init.StopBits   = UART_STOPBITS_1;
-		UartHandle.Init.Parity     = UART_PARITY_NONE;
-		UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-		UartHandle.Init.Mode       = UART_MODE_TX_RX;
-		
-		if(HAL_UART_Init(&UartHandle) != HAL_OK)
-		{
-			Error_Handler();
-		}
-	}
-	else
-	{
-		return ERROR;
-	}
-	return 1;
-}
-
-uint8_t Threshold_Uart1_SendStr(uint8_t* str)
-{
-	if(Threshold_USE)
-	{
-		if(HAL_UART_Transmit(&UartHandle,str,strlen((const char *)str)-1, 10)!= HAL_OK)
-		{
-			Error_Handler();   
-		}
-	}
-	else
-	{
-		return ERROR;
-	}
-	return 1;
-}
-
-uint8_t Threshold_Uart1_RecvStr(uint8_t* str)
-{
-	if(Threshold_USE)
-	{
-		if(HAL_UART_Receive(&UartHandle, (uint8_t *)str,strlen((const char *)str), 10) != HAL_OK)
-		{
-			Error_Handler();  
-		}
-	}
-	else
-	{
-		return ERROR;
-	}
-	return 1;
-}
-/**
-* @brief  This function is executed in case of error occurrence.
-* @param  None
-* @retval None
-*/
-static void Error_Handler(void)
-{
-	/* User may add here some code to deal with this error */
-	while(1)
-	{
-	}
-}
 uint8_t * buffer;
 uint8_t* DatatoBuffer(uint16_t data)
 {
@@ -98,64 +21,21 @@ uint8_t* DatatoBuffer(uint16_t data)
 	return buffer;
 }
 
-uint8_t Threshold_Uart1_Send1Data(uint16_t data)
+void Threshold_UART_Init(uint32_t baudrate)
 {
-	if(Threshold_USE)
-	{
-		if(HAL_UART_Transmit(&UartHandle,DatatoBuffer(data),strlen((const char *)DatatoBuffer(data))-1, 10)!= HAL_OK)
-		{
-			Error_Handler();   
-		}
-	}
-	else
-	{
-		return ERROR;
-	}
-	return 1;
+	
+ UartHandle.Instance = USART1;
+	  UartHandle.Init.BaudRate = baudrate;
+	  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
+	  UartHandle.Init.StopBits = UART_STOPBITS_1;
+	  UartHandle.Init.Parity = UART_PARITY_NONE;
+	  UartHandle.Init.Mode = UART_MODE_TX_RX;
+	  UartHandle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	  UartHandle.Init.OverSampling = UART_OVERSAMPLING_8;
+	  UartHandle.Init.OneBitSampling = UART_ONEBIT_SAMPLING_DISABLED;
+	  UartHandle.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	  HAL_UART_Init(&UartHandle);
 }
-
-uint8_t Threshold_Uart1_Recv1Data(uint16_t data)
-{
-	if(Threshold_USE)
-	{
-		if(HAL_UART_Receive(&UartHandle,DatatoBuffer(data),strlen((const char *)DatatoBuffer(data)), 10) != HAL_OK)
-		{
-			Error_Handler();  
-		}
-	}
-	else
-	{
-		return ERROR;
-	}
-	return 1;
-}
-
-void Threshold_Uart1_DMA_Init(uint32_t baud)
-{
-	/*##-1- Configure the UART peripheral ######################################*/
-  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-  /* UART1 configured as follow:
-      - Word Length = 8 Bits
-      - Stop Bit = One Stop bit
-      - Parity = None
-      - BaudRate = 9600 baud
-      - Hardware flow control disabled (RTS and CTS signals) */
-  UartHandle.Instance        = USARTx;
-  UartHandle.Init.BaudRate   = baud;
-  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-  UartHandle.Init.StopBits   = UART_STOPBITS_1;
-  UartHandle.Init.Parity     = UART_PARITY_NONE;
-  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-  UartHandle.Init.Mode       = UART_MODE_TX_RX;
-  
-  if(HAL_UART_Init(&UartHandle) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-
-
 
 /* Uart Init Callback function */
 
@@ -198,90 +78,35 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 		GPIO_InitStruct.Alternate = USARTx_RX_AF;
 			
 		HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
-		
-  #elif defined(UartDMA)
-	
-		static DMA_HandleTypeDef hdma_tx;
-		static DMA_HandleTypeDef hdma_rx;
-		
-		GPIO_InitTypeDef  GPIO_InitStruct;
-		
-		/*##-1- Enable peripherals and GPIO Clocks #################################*/
-	 
-		/* Enable GPIO TX/RX clock */
+			
+  #endif
+
+	  GPIO_InitTypeDef GPIO_InitStruct;
+	  if(huart->Instance==USART1)
+	  {
+	    /* Peripheral clock enable */
 		USARTx_TX_GPIO_CLK_ENABLE();
 		USARTx_RX_GPIO_CLK_ENABLE();
 		
-		/* Enable USART2 clock */
-		USARTx_CLK_ENABLE(); 
-	 
-		/* Enable DMA1 clock */
-		DMAx_CLK_ENABLE();   
-		
-		/*##-2- Configure peripheral GPIO ##########################################*/  
-	 
-		/* UART TX GPIO pin configuration  */
-		GPIO_InitStruct.Pin       = USARTx_TX_PIN;
-		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_NOPULL;
-		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH  ;
-		GPIO_InitStruct.Alternate = USARTx_TX_AF;
-		
-		HAL_GPIO_Init(USARTx_TX_GPIO_PORT, &GPIO_InitStruct);
+	    __USART1_CLK_ENABLE();
+	  
+	    /**USART2 GPIO Configuration    
+	    PA9     ------> USART1_TX
+	    PA10     ------> USART1_RX 
+	    */
+	    GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
+	    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	    GPIO_InitStruct.Pull = GPIO_NOPULL;
+	    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	    GPIO_InitStruct.Alternate = GPIO_AF4_USART1;
+	    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 			
-		/* UART RX GPIO pin configuration  */
-		GPIO_InitStruct.Pin = USARTx_RX_PIN;
-		GPIO_InitStruct.Alternate = USARTx_RX_AF;
+		__HAL_UART_ENABLE_IT(&UartHandle,UART_IT_RXNE);
 			
-		HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
-			
-		/*##-3- Configure the DMA streams ##########################################*/
-		/* Configure the DMA handler for Transmission process */
-		hdma_tx.Instance                 = USARTx_TX_DMA_CHANNEL;
-		
-		hdma_tx.Init.Request             = USARTx_TX_DMA_REQUEST;
-		hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-		hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-		hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-		hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-		hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-		hdma_tx.Init.Mode                = DMA_NORMAL;
-		hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
-		HAL_DMA_Init(&hdma_tx);  
-		
-		/* Associate the initialized DMA handle to the the UART handle */
-		__HAL_LINKDMA(huart, hdmatx, hdma_tx);
-		
-		/* Configure the DMA handler for Transmission process */
-		hdma_rx.Instance = USARTx_RX_DMA_CHANNEL;
-		
-		hdma_rx.Init.Request             = USARTx_RX_DMA_REQUEST;
-		hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-		hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-		hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
-		hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-		hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-		hdma_rx.Init.Mode                = DMA_NORMAL;
-		hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;  
-		HAL_DMA_Init(&hdma_rx);
-		 
-		/* Associate the initialized DMA handle to the the UART handle */
-		__HAL_LINKDMA(huart, hdmarx, hdma_rx);
-			
-		/*##-4- Configure the NVIC for DMA #########################################*/
-		/* NVIC configuration for DMA transfer complete interrupt (USART1_TX) */
-		HAL_NVIC_SetPriority(USARTx_DMA_TX_IRQn, 0, 1);
-		HAL_NVIC_EnableIRQ(USARTx_DMA_TX_IRQn);
-			
-		/* NVIC configuration for DMA transfer complete interrupt (USART1_RX) */
-		HAL_NVIC_SetPriority(USARTx_DMA_RX_IRQn, 0, 0);   
-		HAL_NVIC_EnableIRQ(USARTx_DMA_RX_IRQn);
-
-		/* NVIC for USART, to catch the TX complete */
-		HAL_NVIC_SetPriority(USARTx_IRQn, 0, 1);
-		HAL_NVIC_EnableIRQ(USARTx_IRQn);
-		
-	#endif
+	    /* Peripheral interrupt init*/
+	    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+	    HAL_NVIC_EnableIRQ(USART1_IRQn);
+	  }
 }
 
 /**
@@ -305,74 +130,24 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 		HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
 		/* Configure UART Rx as alternate function  */
 		HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
-	
-	#elif defined(UartDMA)
-	
-		static DMA_HandleTypeDef hdma_tx;
-		static DMA_HandleTypeDef hdma_rx;
-
-		/*##-1- Reset peripherals ##################################################*/
-		USARTx_FORCE_RESET();
-		USARTx_RELEASE_RESET();
-
-		/*##-2- Disable peripherals and GPIO Clocks #################################*/
-		/* Configure UART Tx as alternate function  */
-		HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
-		/* Configure UART Rx as alternate function  */
-		HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
-		 
-		/*##-3- Disable the DMA Streams ############################################*/
-		/* De-Initialize the DMA Stream associate to transmission process */
-		HAL_DMA_DeInit(&hdma_tx); 
-		/* De-Initialize the DMA Stream associate to reception process */
-		HAL_DMA_DeInit(&hdma_rx);
-		
-		/*##-4- Disable the NVIC for DMA ###########################################*/
-		HAL_NVIC_DisableIRQ(USARTx_DMA_TX_IRQn);
-		HAL_NVIC_DisableIRQ(USARTx_DMA_RX_IRQn);	
-		
 	#endif
+
+	  if(huart->Instance==USART1)
+	  {
+	    /* Peripheral clock disable */
+	    __USART1_CLK_DISABLE();
+	  
+	    /**USART2 GPIO Configuration    
+	    PA2     ------> USART2_TX
+	    PA3     ------> USART2_RX 
+	    */
+	    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
+
+	    /* Peripheral interrupt Deinit*/
+	    HAL_NVIC_DisableIRQ(USART1_IRQn);
+	  }
 }
 
-/**
-  * @brief  Tx Transfer completed callback
-  * @param  UartHandle: UART handle. 
-  * @note   This example shows a simple way to report end of DMA Tx transfer, and 
-  *         you can add your own implementation. 
-  * @retval None
-  */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
-{
-  /* Set transmission flag: trasfer complete*/
-  UartReady = SET;
-}
-
-/**
-  * @brief  Rx Transfer completed callback
-  * @param  UartHandle: UART handle
-  * @note   This example shows a simple way to report end of DMA Rx transfer, and 
-  *         you can add your own implementation.
-  * @retval None
-  */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
-{
-  /* Set transmission flag: trasfer complete*/
-  UartReady = SET;
-}
-
-/**
-  * @brief  UART error callbacks
-  * @param  UartHandle: UART handle
-  * @note   This example shows a simple way to report transfer error, and you can
-  *         add your own implementation.
-  * @retval None
-  */
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
-{
-  while(1)
-  {
-  }
-}
 
 /**
   * @brief  Compares two buffers.
@@ -396,20 +171,6 @@ uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength)
   return 0;
 }
 
-void Threshold_UartDMA_Transmit(uint8_t data)
-{
-	uint8_t TransmitData[1];
-	TransmitData[0] = data;
-	HAL_UART_Transmit_DMA(&UartHandle,TransmitData,1);
-}
-
-uint8_t Threshold_UartDMA_Receive()
-{
-	uint8_t *ReceiveBuffer;
-	HAL_UART_Receive_DMA(&UartHandle,ReceiveBuffer,1);
-	return *ReceiveBuffer;
-}
-
 void Threshold_Uart_SendChar(uint8_t data)
 {
 	while((USART1->ISR&0X40) == 0);
@@ -424,6 +185,7 @@ struct __FILE
 
 }; 
 
+/* ÆôÓÃprintf */
 FILE __stdout;      
 void _sys_exit(int x) 
 { 
@@ -431,8 +193,120 @@ void _sys_exit(int x)
 } 
 
 int fputc(int ch, FILE *f)
-{      
+{     
+	#if 1
 	 while((USART1->ISR&0X40) == 0);
 	 USART1->TDR = (uint8_t) ch;      
 	 return ch;
+	#endif
 }
+
+int ASCII_To_Dec(uint8_t ASCII_Data)
+{
+	uint8_t Dec;
+	if((ASCII_Data >= 48) && (ASCII_Data <= 57)) //1-9
+	{
+		Dec = ASCII_Data - 48;
+	}
+	else
+	{
+		return -1;	
+
+
+	}
+	
+	return Dec;
+}
+
+uint8_t RTC_SetTimeDataConvert(uint8_t data)
+{
+	 uint8_t d;
+	 if(data < 10)
+	 {
+		 d = data;
+	 }
+	 else if(data >10 && data < 20)
+	 {
+		 d  = data + 6;
+	 }
+	 else if(data > 20 && data < 30)
+	 {
+	 	d = data + 12;
+     }
+	 else if(data > 30 && data < 40)
+	 {
+	 	d = data + 18;
+	 }
+	 else if(data > 40 && data < 50)
+	 {
+	 	d = data + 24;
+	 }
+	 else if(data > 50 && data < 60)
+	 {
+	 	d = data + 30;
+	 }
+	 
+	 return d;
+}
+
+void RTC_Refresh(void)
+{
+	
+	 uint8_t year,month,day,week,hour,minute,second;
+	 year =   RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[0])  * 10 + ASCII_To_Dec(TimeBuffer[1]));
+	 month =  RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[2])  * 10 + ASCII_To_Dec(TimeBuffer[3]));
+	 day =    RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[4])  * 10 + ASCII_To_Dec(TimeBuffer[5]));
+	 week =   RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[6])  * 10 + ASCII_To_Dec(TimeBuffer[7]));
+	 hour =   RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[8])  * 10 + ASCII_To_Dec(TimeBuffer[9]));
+	 minute = RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[10]) * 10 + ASCII_To_Dec(TimeBuffer[11]));
+	 second = RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[12]) * 10 + ASCII_To_Dec(TimeBuffer[13]));
+	 
+	 
+	 Threshold_RTC_Init(year,month,day,week,hour,minute,second);
+	 
+	
+}
+
+void Threshold_BlE_Deal(void)
+{
+	uint8_t i;
+	if(true == SetTime)
+	{
+		
+		if(SetTimeOK == true)
+		{
+			RTC_Refresh();
+			Threshold_RTC_TimeShow();
+			SetTime = false;
+			SetTimeOK = false;
+			for(i = 0; i < 20; i++)
+			{
+				TimeBuffer[i] = 0;
+			}
+		}
+	}
+	
+	if(true == SendMMA9553L_Data)
+	{
+		printf("Step:%d Distance:%d Calory:%d\r\n",m_status.StepCount,m_status.Distance,m_status.Calories);
+		SendMMA9553L_Data = false;
+	}
+
+	if(true == SendPulse_Data)
+	{
+		SendPulse_Data = false;
+	}
+
+	if(true == SendSysInfo)
+	{
+		printf("------------------SmartBand V2.0-------------------\r\n");
+		printf("------------------------------HARDWARE------------------------------\r\n");
+		printf("--------CPU: STM32L053R8T6----ACC:MMA9553L------------\r\n");
+		printf("--------SoftWare---Version--2.1-------Author:ZhaoXiang----\r\n");
+		SendSysInfo = false;
+	}
+}
+
+
+
+

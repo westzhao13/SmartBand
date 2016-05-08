@@ -14,7 +14,7 @@
 #include "main.h"
 /* private define */
 
-#define UartDMA
+//#define UartDMA
 //#define UartPolling
 
 /* private function decline */
@@ -37,7 +37,7 @@
 
 /* Definition for USARTx's DMA */
 #define USARTx_TX_DMA_CHANNEL             DMA1_Channel2
-#define USARTx_TX_DMA_REQUEST             DMA_REQUEST_3
+#define USARTx_TX_DMA_REQUEST             DMA_REQUEST_2
 #define USARTx_RX_DMA_CHANNEL             DMA1_Channel3
 #define USARTx_RX_DMA_REQUEST             DMA_REQUEST_3
 
@@ -59,14 +59,8 @@
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 /* Exported functions ------------------------------------------------------- */
-uint8_t Threshold_Uart1_Init(uint32_t Baud);
-uint8_t Threshold_Uart1_RecvStr(uint8_t* str);
-uint8_t Threshold_Uart1_SendStr(uint8_t* str);
-uint8_t Threshold_Uart1_Send1Data(uint16_t data);
-uint8_t Threshold_Uart1_Recv1Data(uint16_t data);
-void Threshold_Uart1_DMA_Init(uint32_t baud);
-void Threshold_UartDMA_Transmit(uint8_t data);
-uint8_t Threshold_UartDMA_Receive(void);
+void Threshold_UART_Init(uint32_t baudrate);
 void Threshold_Uart_SendChar(uint8_t data);
+void Threshold_BlE_Deal(void);
 
 #endif

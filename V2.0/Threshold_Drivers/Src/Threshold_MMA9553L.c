@@ -2,6 +2,13 @@
 
 PM_Status    m_status;
 MMA9553_CMD  m_cmddata;
+extern uint8_t MMA9553L_I2C_OK;
+uint8_t MMA9553L_OK;
+
+#define MMA_Power_On()    (GPIOA->BSRR = GPIO_15)
+#define MMA_Power_Off()   (GPIOA->BRR = GPIO_15)
+
+
 
 static void Delay_US(void)
 {
@@ -23,34 +30,48 @@ static void Delay_US(void)
 ********************************************************************/
 void pedometer_main(void)
 {
-   unsigned char Buf[20];
-//   int StepCount; //wenxue
-   pedometer_cmd_readstatus(); // read  // å†™äº†{0x15,0x30,0x00,0x0C}
-	 Delay_US();
+	   static unsigned short laststep;
+       unsigned char Buf[20];
+       //int StepCount; //wenxue
+
+	   laststep =  m_status.StepCount;
+       pedometer_cmd_readstatus(); // read  // å†™äº†{0x15,0x30,0x00,0x0C}
+	   Delay_US();
         
-   while(1)
-   {
-		 //Delay_US();
-     dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 2);
-     //printf("Buf[1]==%02x\r\n",Buf[1]);// wenxue
-    // Delay_US();
-     if(Buf[1]==0x80)
-      {
-        dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 16);  
-        break;
+	   //while(1)
+	   //{
+	   Delay_US();
+	   Delay_US();
+       dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 2);
+       if(Buf[1]==0x80)
+       {
+	        dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 16);
+			MMA9553L_OK = true;
+	        //break;
        }
-    }
+	   else
+	   {
+	   		MMA9553L_OK = false;
+			printf("MMA9553L Load Fail! \r\n");
+			MMA9553L_Init();//ÖÐÍ¾³ö´íÖØÐÂ³õÊ¼»¯
+	   }
+	    //}
     
-    // wenxue      
-      //  for(int i=0;i<16;i++)
-         // printf("Buf[%d]=%02x\r\n",i,Buf[i]);       
-			// Delay_US();
-      // dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 16);  
-       m_status.StepCount = Buf[6] * 256 + Buf[7];
-		   printf("Step:%d\r\n",m_status.StepCount);
-       
+       // wenxue      
+       //for(int i=0;i<16;i++)
+       // printf("Buf[%d]=%02x\r\n",i,Buf[i]);       
+	   // Delay_US();
+       // dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 16);
+
+	   if(MMA9553L_OK == true)
+	   {
+	       m_status.StepCount = Buf[6] * 256 + Buf[7];
+		   if(m_status.StepCount != laststep)
+		 		printf("Step : %d\r\n",m_status.StepCount);
+	       
 		   m_status.Distance  = Buf[8] * 256 + Buf[9];
-       m_status.Calories  = Buf[12] * 256 + Buf[13];
+	       m_status.Calories  = Buf[12] * 256 + Buf[13];
+	   }
 }
 
 /******************************************************************** 
@@ -80,52 +101,119 @@ void pedometer_clear(void)
 * è°ƒç”¨æ¨¡å—:  
 * è¯´    æ˜Ž: å¤ä½åŽæ‰§è¡Œä¸€æ¬¡ã€‚å®ƒè¢«ç”¨æ¥é…ç½®åº”ç”¨ç¨‹åºçš„ä»»åŠ¡è°ƒåº¦å±žæ€§å’Œè¦æ±‚
 *           åŠ¨æ€å†…å­˜åˆ†é…ã€‚
-* æ³¨    æ„:  
+* æ³¨    æ„:
 ********************************************************************/
+
+/*
+	Í¨¹ýµ÷ÊÔ·¢ÏÖ¾­³£»á³öÏÖ³õÊ¼»¯Ê§°ÜµÄÇé¿ö¡£
+	½â¾ö°ì·¨ÈçÏÂ:
+	µÚÒ»²½¡£Ê×ÏÈ¼ì²âi2c¶ÁÐ´ÊÇ·ñÕý³££¬Èç¹ûÕý³££¬ÄÇÃ´ÔËÐÐ³õÊ¼»¯º¯Êý£¬ÖØ¸´¶à´Î£¬Á½µÀÈý´Î×óÓÒ¡£
+	µÚ¶þ²¿¡£Èç¹û¶ÁÐ´²»Õý³££¬ÄÇÃ´¸´Î»1.8vÊ¹ÄÜ£¬Ò²¾ÍÊÇµçÔ´¿ª¹Ø¡£Ö±µ½i2c¶ÁÐ´Õý³£ÎªÖ¹¡£
+	µÚÈý²¿¡£ÔËÐÐ³õÊ¼»¯º¯Êý£¬Á½µ½Èý´Î£¬ÖØ¸´¶à´Î¡£
+*/
+uint8_t MMA9553L_Init(void)
+{
+	/*µçÔ´¸´Î»Òý½Å³õÊ¼»¯*/
+	Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_15,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+	
+	do
+	{
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		
+		/*add your code here*/   //µçÔ´¸´Î»
+		MMA_Power_Off(); //off
+		
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		
+		MMA_Power_On(); //on
+		
+		Delay_US();
+		Delay_US();
+		Delay_US();
+
+		pedometer_init();//Ö´ÐÐµÚÒ»´Î
+		Delay_US();
+		Delay_US();
+		pedometer_init();//Ö´ÐÐµÚÒ»´Î
+		Delay_US();
+		Delay_US();
+		pedometer_init();//Ö´ÐÐµÚÒ»´Î
+
+		printf("---------wait for MMA9553L init------\r\n");
+		
+	}while(MMA9553L_I2C_OK == false);  //I2C¼ì²â²»Õý³£
+
+	do
+	{
+		 /* I2C¼ì²âÕý³£  ÖØ¸´³õÊ¼»¯ */
+		 pedometer_init();
+	}while(MMA9553L_OK == false);
+	
+	printf("---------MMA9553L init success------\r\n");
+	
+	return 1;
+}
+
+
 void pedometer_init(void)
 {
   unsigned char Buf[20];  
-  
+  static unsigned short laststep;
+
+  laststep =  m_status.StepCount;
   //int StepCount; //wenxue
    
-   // pedometer_reset();          // reset pedometer
-//	Delay_US();
+    pedometer_reset();          // reset pedometer
+	Delay_US();
     pedometer_write_config();       // config
-	//Delay_US();
+	Delay_US();
     pedometer_enable();         // enable pedometer
-//	Delay_US();
-    pedometer_int0_enable();    // enable INT_O pin
-	//Delay_US();
+	Delay_US();
+    //pedometer_int0_enable();    // enable INT_O pin
+	Delay_US();
     pedometer_active();         // active MMA9553
-	//Delay_US();
+	Delay_US();
     pedometer_wakeup();
     
-  //  Delay_US();
+    Delay_US();
     pedometer_afe_config(); // afe config    wenxue
-  //  Delay_US();
+    Delay_US();
     Delay_US();   
     
-		pedometer_cmd_readstatus();
+	pedometer_cmd_readstatus();
     Delay_US();
 
-    while(1)  
+    //while(1)  
     {
-		   Delay_US();
-			 Delay_US();
-       dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 2);
-       printf("MMA9553L Load Fail!");// wenxue
-       if(Buf[1]==0x80)
-       {
-         dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 16); // 12 bytes status data + 4 bytes frame start 
-         break; // wenxue
+		Delay_US();
+		Delay_US();
+       	dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 2);
+       	if(Buf[1]==0x80)
+       	{
+         	dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 16); // 12 bytes status data + 4 bytes frame start 
+         	MMA9553L_OK = true;
+         	//break; // wenxue
     
         }
-     }
-		
+		else
+		{
+			MMA9553L_OK = false;
+			printf("MMA9553L Load Fail! \r\n");// wenxue
+		}
+    }
+
+	if(MMA9553L_OK == true)
+	{
 		//dvMMA9553_Read(MMA9553_Slave_Addr, MMA9553_Sub_Addr, Buf, 16); // 12 bytes status data + 4 bytes frame start 
-     m_status.StepCount = Buf[6] * 256 + Buf[7];
-		 printf("Step : %d\r\n",m_status.StepCount);
-		 
+		 m_status.StepCount = Buf[6] * 256 + Buf[7];
+
+		if(m_status.StepCount != laststep)
+		 	printf("Step : %d\r\n",m_status.StepCount);
+	}
     
 }
 
@@ -309,7 +397,7 @@ void dvMMA9553_Read(unsigned char deviceAddr,unsigned char regAddr, unsigned cha
 {
     
  // I2c_ReadRegister(I2C0_BASE_PTR,deviceAddr,regAddr,data,len);
-  I2C_Read_Len(deviceAddr,regAddr,len,data); // wenxue
+  	Threshold_I2C_MasterRecvBytes(deviceAddr, regAddr, data, len); // wenxue
 }
 
 /********************************************************************
@@ -328,7 +416,8 @@ void dvMMA9553_Write(unsigned char deviceAddr,unsigned char regAddr, unsigned ch
 {
    //I2c_WriteRegister(I2C0_BASE_PTR,deviceAddr,regAddr,data,len);
   //I2c_WriteRegister(I2C1_BASE_PTR,deviceAddr,regAddr,data,len);  // wenxue
-  I2C_Write_Len(deviceAddr,regAddr,len,data);
+  //I2C_Write_Len(deviceAddr,regAddr,len,data);
+  Threshold_I2C_MasterSendBytes(deviceAddr, regAddr, data, len);
 }
 
 

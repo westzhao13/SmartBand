@@ -3,6 +3,7 @@
 RTC_HandleTypeDef RtcHandle;
 
 static void Error_Handler(void);
+extern __IO ITStatus UartReady;
 
 uint8_t Threshold_RTC_Init(uint8_t year,uint8_t month,uint8_t date,uint8_t week,uint8_t hour,uint8_t minute,uint8_t seconds)
 {
@@ -95,17 +96,16 @@ RTC_DateTypeDef sdatestructureget;
 RTC_TimeTypeDef stimestructureget;
 void Threshold_RTC_TimeShow(void)
 {
-  
-
   /* Get the RTC current Time */
   HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN);
   /* Get the RTC current Date */
   HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BIN);
-  
-  /* Display time Format : hh:mm:ss */
-  //printf("%.2d:%.2d:%.2d \r\n",stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
-	/* Display time Format : hh:mm:ss */
-  //printf("20%.2d %.2d %.2d WeekDay:%d \r\n",sdatestructureget.Year, sdatestructureget.Month, sdatestructureget.Date,sdatestructureget.WeekDay);
+
+
+	  /* Display time Format : hh:mm:ss */
+	  printf("%.2d:%.2d:%.2d \r\n",stimestructureget.Hours, stimestructureget.Minutes, stimestructureget.Seconds);
+	  /* Display time Format : hh:mm:ss */
+	  printf("20%.2d %.2d %.2d WeekDay:%d \r\n",sdatestructureget.Year, sdatestructureget.Month, sdatestructureget.Date,sdatestructureget.WeekDay);
 } 
 
 /**

@@ -1,0 +1,56 @@
+[Stack]
+FillEnabled=0
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnLogOnly=1
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[DebugChecksum]
+Checksum=802768727
+[Exceptions]
+StopOnUncaught=_ 0
+StopOnThrow=_ 0
+[CallStack]
+ShowArgs=0
+[Disassembly]
+MixedMode=1
+[CodeCoverage]
+Enabled=_ 0
+[JLinkDriver]
+CStepIntDis=_ 0
+TraceBufferSize=0x00010000
+TraceStallIfFIFOFull=0x00000000
+TracePortSize=0x00000000
+[watch_formats]
+Fmt0={W}1:Buf	4	4
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=1
+Graph=0
+Symbiont=0
+Exclusions=
+[Breakpoints2]
+Count=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[Disassemble mode]
+mode=0
+[Breakpoints]
+Count=0
+[Aliases]
+A0=_ "C:\Users\B51443\Desktop\KL25 Sample Code -3\kl25_sc_rev10\klxx-sc-baremetal\src\projects\FRDM_KL25ZDemo\FRDM_KL25ZDemo.c" ""
+A1=_ "C:\Users\B51443\Desktop\KL25 Sample Code -3\kl25_sc_rev10\klxx-sc-baremetal\src\projects\FRDM_KL25ZDemo\I2C\hal_dev_mma8451.c" ""
+A2=_ "C:\work\KL25\KL25 Sample Code\kl25_sc_rev10\klxx-sc-baremetal\src\projects\FRDM_KL25ZDemo\FRDM_KL25ZDemo.c" ""
+A3=_ "C:\work\KL25\KL25 Sample Code\kl25_sc_rev10\klxx-sc-baremetal\src\projects\FRDM_KL25ZDemo\I2C\hal_dev_mma8451.c" ""
+Count=4
+SuppressDialog=0

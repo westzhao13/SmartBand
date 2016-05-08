@@ -28,18 +28,18 @@
 #define MPU_I2CSLV2_REG				0X2C	//IIC从机2数据地址寄存器
 #define MPU_I2CSLV2_CTRL_REG	0X2D	//IIC从机2控制寄存器
 #define MPU_I2CSLV3_ADDR_REG	0X2E	//IIC从机3器件地址寄存器
-#define MPU_I2CSLV3_REG				0X2F	//IIC从机3数据地址寄存器
+#define MPU_I2CSLV3_REG			0X2F	//IIC从机3数据地址寄存器
 #define MPU_I2CSLV3_CTRL_REG	0X30	//IIC从机3控制寄存器
 #define MPU_I2CSLV4_ADDR_REG	0X31	//IIC从机4器件地址寄存器
-#define MPU_I2CSLV4_REG				0X32	//IIC从机4数据地址寄存器
+#define MPU_I2CSLV4_REG			0X32	//IIC从机4数据地址寄存器
 #define MPU_I2CSLV4_DO_REG		0X33	//IIC从机4写数据寄存器
 #define MPU_I2CSLV4_CTRL_REG	0X34	//IIC从机4控制寄存器
 #define MPU_I2CSLV4_DI_REG		0X35	//IIC从机4读数据寄存器
 
 #define MPU_I2CMST_STA_REG		0X36	//IIC主机状态寄存器
-#define MPU_INTBP_CFG_REG			0X37	//中断/旁路设置寄存器
-#define MPU_INT_EN_REG				0X38	//中断使能寄存器
-#define MPU_INT_STA_REG				0X3A	//中断状态寄存器
+#define MPU_INTBP_CFG_REG		0X37	//中断/旁路设置寄存器
+#define MPU_INT_EN_REG			0X38	//中断使能寄存器
+#define MPU_INT_STA_REG			0X3A	//中断状态寄存器
 
 #define MPU_ACCEL_XOUTH_REG		0X3B	//加速度值,X轴高8位寄存器
 #define MPU_ACCEL_XOUTL_REG		0X3C	//加速度值,X轴低8位寄存器
@@ -48,8 +48,8 @@
 #define MPU_ACCEL_ZOUTH_REG		0X3F	//加速度值,Z轴高8位寄存器
 #define MPU_ACCEL_ZOUTL_REG		0X40	//加速度值,Z轴低8位寄存器
 
-#define MPU_TEMP_OUTH_REG			0X41	//温度值高八位寄存器
-#define MPU_TEMP_OUTL_REG			0X42	//温度值低8位寄存器
+#define MPU_TEMP_OUTH_REG		0X41	//温度值高八位寄存器
+#define MPU_TEMP_OUTL_REG		0X42	//温度值低8位寄存器
 
 #define MPU_GYRO_XOUTH_REG		0X43	//陀螺仪值,X轴高8位寄存器
 #define MPU_GYRO_XOUTL_REG		0X44	//陀螺仪值,X轴低8位寄存器
@@ -66,13 +66,13 @@
 #define MPU_I2CMST_DELAY_REG	0X67	//IIC主机延时管理寄存器
 #define MPU_SIGPATH_RST_REG		0X68	//信号通道复位寄存器
 #define MPU_MDETECT_CTRL_REG	0X69	//运动检测控制寄存器
-#define MPU_USER_CTRL_REG			0X6A	//用户控制寄存器
-#define MPU_PWR_MGMT1_REG			0X6B	//电源管理寄存器1
-#define MPU_PWR_MGMT2_REG			0X6C	//电源管理寄存器2 
-#define MPU_FIFO_CNTH_REG			0X72	//FIFO计数寄存器高八位
-#define MPU_FIFO_CNTL_REG			0X73	//FIFO计数寄存器低八位
-#define MPU_FIFO_RW_REG				0X74	//FIFO读写寄存器
-#define MPU_DEVICE_ID_REG			0X75	//器件ID寄存器
+#define MPU_USER_CTRL_REG		0X6A	//用户控制寄存器
+#define MPU_PWR_MGMT1_REG		0X6B	//电源管理寄存器1
+#define MPU_PWR_MGMT2_REG		0X6C	//电源管理寄存器2 
+#define MPU_FIFO_CNTH_REG		0X72	//FIFO计数寄存器高八位
+#define MPU_FIFO_CNTL_REG		0X73	//FIFO计数寄存器低八位
+#define MPU_FIFO_RW_REG			0X74	//FIFO读写寄存器
+#define MPU_DEVICE_ID_REG		0X75	//器件ID寄存器
  
 //如果AD0脚(9脚)接地,IIC地址为0X68(不包含最低位).
 //如果接V3.3,则IIC地址为0X69(不包含最低位).

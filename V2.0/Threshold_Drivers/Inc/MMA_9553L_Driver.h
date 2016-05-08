@@ -3,6 +3,9 @@
 
 #include "main.h"
 
+
+#define Device_MMA9553L
+
 //ADDRESS
 #define MMA9553_Slave_Addr  0x4C 
 #define MMA9553_Sub_Addr    0x00
@@ -40,6 +43,7 @@ extern MMA9553_CMD m_cmddata;
 /******************************************************************** 
 *         函数声明
 ********************************************************************/ 
+uint8_t MMA9553L_Init(void);
 void pedometer_main(void);
 void pedometer_init(void);
 void pedometer_reset(void);

@@ -44,7 +44,7 @@ void MenuInit(void)
 void Menu(void (*page1)(),void (*page2)(),void (*page3)(),void (*page4)(),void (*page5)())
 {
 	//É¨Ãè°´¼ü×´Ì¬
-#if (USE_FreeRTOS == 0)
+#if (USE_FreeRTOS == FALSE)
 	KeyState key;
 	key = GetKey();
 #endif
@@ -60,7 +60,7 @@ void Menu(void (*page1)(),void (*page2)(),void (*page3)(),void (*page4)(),void (
 			menu.Page.pageNum = menu.Page.pageDefault;
 		}
 		OLED_Clear();
-		key =NotPress;
+		key = NotPress;
 	}
 	switch (menu.Page.pageNum)
 	{

@@ -1,0 +1,3 @@
+---- USART1_IRQHandler Matches (2 in 2 files) ----
+Stm32l0xx_it.c (h:\smartband(threshold)\smartband\v2.0\users\src):	void USART1_IRQHandler(void)                	//¡ä??¨²1?D??¡¤t??3¨¬D¨°
+Threshold_UART.h (h:\smartband(threshold)\smartband\v2.0\threshold_drivers\inc):#define USARTx_IRQHandler                USART1_IRQHandler

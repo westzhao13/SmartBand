@@ -3,19 +3,19 @@
 
 #include "main.h"
 
-#define OLED_SCL_PIN     GPIO_15
-#define OLED_SDA_PIN     GPIO_1
+#define OLED_SCL_PIN     GPIO_6
+#define OLED_SDA_PIN     GPIO_7
 #define OLED_RST_PIN     GPIO_4
-#define OLED_DC_PIN      GPIO_0
+#define OLED_DC_PIN      GPIO_5
 
-#define OLED_SCL_High()  (GPIOA->BSRR = OLED_SCL_PIN) //24   //D0
-#define OLED_SCL_Low()   (GPIOA->BRR = OLED_SCL_PIN)		//24   //D0
+#define OLED_SCL_High()  (GPIOB->BSRR = OLED_SCL_PIN) //24   //D0
+#define OLED_SCL_Low()   (GPIOB->BRR = OLED_SCL_PIN)		//24   //D0
 
-#define OLED_SDA_High()  (GPIOA->BSRR = OLED_SDA_PIN) //26   //D1
-#define OLED_SDA_Low()   (GPIOA->BRR = OLED_SDA_PIN)   //26   //D1
+#define OLED_SDA_High()  (GPIOB->BSRR = OLED_SDA_PIN) //26   //D1
+#define OLED_SDA_Low()   (GPIOB->BRR = OLED_SDA_PIN)   //26   //D1
 
-#define OLED_RST_High()  (GPIOA->BSRR = OLED_RST_PIN) //25   //RST
-#define OLED_RST_Low()   (GPIOA->BRR = OLED_RST_PIN)   //25   //RST
+#define OLED_RST_High()  (GPIOB->BSRR = OLED_RST_PIN) //25   //RST
+#define OLED_RST_Low()   (GPIOB->BRR = OLED_RST_PIN)   //25   //RST
 
 #define OLED_DC_High()   (GPIOB->BSRR = OLED_DC_PIN) //28   //DC
 #define OLED_DC_Low()    (GPIOB->BRR = OLED_DC_PIN)   //28   //DC
@@ -70,3 +70,6 @@ void OLED_Clear(void);
 
 
 #endif
+
+
+

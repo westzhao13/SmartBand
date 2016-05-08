@@ -1,0 +1,22 @@
+/*
+ * File:		FRDM_KL25ZDemo.c
+ * Purpose:		Main process
+ *
+ */
+
+#include "common.h"
+
+/********************************************************************/
+int main (void)
+{
+	char ch;
+        
+  	printf("\nRunning the FRDM_KL25ZDemo project.\n");
+
+	while(1)
+	{
+		ch = in_char();
+		out_char(ch);
+	} 
+}
+/********************************************************************/
