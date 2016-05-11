@@ -21,13 +21,19 @@ static void Error_Handler(void);
 {
 	Threshold_USE = 1;
 	/* Configure the System clock to have a frequency of 2 MHz (Up to 32MHZ possible) */
-  	Threshold_SystemClock_Config(System_16Mhz);
+  	Threshold_SystemClock_Config(System_32Mhz);
 
-	Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_5,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
-	
+	Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_2,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+	//Threshold_GPIO_EXTI_Init(GPIOA, 0);
+	//Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_0,GPIO_MODE_INPUT,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 	//uart
 	Threshold_UART_Init(115200);
 	printf("SmartBand_v2.0------------by westzhao \r\n");
+	
+	//oled
+	OLED_Init();
+	printf("OLED Load Success! \r\n");
+	OLED_Printf(0,(uint8_t*)"OLED Loading");
 	
 	//i2c
 	#if defined(Gpio_I2C)
@@ -50,35 +56,43 @@ static void Error_Handler(void);
 	if(true == MPU6050Init())
 	{
 		
-printf("MPU6050 Init Success! \r\n");
+		printf("MPU6050 Init Success! \r\n");
 	}
 	else
 	{
 		
-printf("MPU6050 Init Failed! \r\n");
+		printf("MPU6050 Init Failed! \r\n");
 	}
 	#endif
+	
+	
 	
 	//menu
 	MenuInit();
 	printf("UI Load Success! \r\n");
-	
+	OLED_Printf(4,(uint8_t*)"UI Loading");
   	//rtc
-	Threshold_RTC_Init(0x16,0x02,0x09,0x2,0x14,0x13,0x00);
+	Threshold_RTC_Init(0x16,0x05,0x11,0x3,0x20,0x53,0x00);
 	printf("RTC Load Success! \r\n");
-	
-	//oled
-	OLED_Init();
-	printf("OLED Load Success! \r\n");
-	
+	OLED_Printf(0,(uint8_t*)"RTC Loading");
 	//adc
-	//Threshold_ADC_Init();
-	//printf("ADC Init Success! \n");
-	
+	Threshold_ADC_Init();
+	printf("ADC Init Success! \n");
+	OLED_Printf(1,(uint8_t*)"ADC Loading");
 	/* Timerbase Init in 10ms*/
-  	Threshold_TIM6_Init(10); //10ms
+    Threshold_TIM6_Init(10); //10ms
 	printf("Timer Load Success! \r\n");
+    OLED_Printf(2,(uint8_t*)"TimerLoading");
 	
+	Threshold_Pulse_Init();
+	OLED_Printf(3,(uint8_t*)"Pulse Loading");
+	
+	OLED_Clear();
+	
+	OLED_Write_String(6,2,(uint8_t*)"Hello Band");
+	OLED_Printf_Delay(500);
+	
+	OLED_Clear();
 	return 1;
 }
 
@@ -97,7 +111,7 @@ uint8_t BSP_Init(void)
 	MenuInit();  //menu初始化
 	printf("UI Init success! \r\n");
 	//LED灯初始化
-    Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_5,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_VERY_HIGH);
+    Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_2,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_VERY_HIGH);
 	//RTC初始化
 	Threshold_RTC_Init(0x16,0x02,0x018,0x4,0x19,0x04,0x00);
 	printf("RTC Init success! \r\n");

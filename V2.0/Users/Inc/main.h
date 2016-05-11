@@ -61,6 +61,7 @@
 #include "User_Menu.h"
 #include "User_DataToPC.h"
 #include "User_MPU_Count.h"
+#include "User_AD.h"
 
 #include <string.h>
 
@@ -85,7 +86,8 @@ typedef enum
 	time = 'A', 
 	mmadata,
 	pulsedata,
-	sysinfo
+	sysinfo,
+	reboot = 'F'
 }BLE_InfoTypeEnum;
 
 

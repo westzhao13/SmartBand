@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-
+extern TIM_HandleTypeDef      TimHandle2;
 extern TIM_HandleTypeDef    TimHandle;
 extern I2C_HandleTypeDef    I2CxHandle;
 extern UART_HandleTypeDef UartHandle;
@@ -51,6 +51,7 @@ extern uint8_t Time100ms_Flag;
 extern uint8_t Time200ms_Flag;
 extern uint8_t Time500ms_Flag;
 extern uint8_t Time1s_Flag;
+extern uint8_t Time1_Minute_Flag;
 
 //time
 extern uint8_t Time2ms;
@@ -63,8 +64,16 @@ extern uint8_t Time100ms;
 extern uint8_t Time200ms;
 extern uint16_t Time500ms;
 extern uint16_t Time1s;
+extern uint16_t Time1_Minute;
+
+
 
 extern uint16_t HeartBeat;
+extern uint16_t HeartBeat_In5S;
+extern uint16_t HeartBeat_In6S;
+extern uint16_t HeartBeat_In9S;
+extern uint16_t HeartBeat_In10S;
+extern uint16_t pulse[10];
 
 extern unsigned char QS;
 extern int BPM;                   // used to hold the pulse rate
@@ -81,7 +90,7 @@ extern uint8_t SetTime;
 extern uint8_t SendMMA9553L_Data;
 extern uint8_t SendPulse_Data;
 extern uint8_t SendSysInfo;
-
+extern uint8_t Reboot;
 extern uint8_t TimeBuffer[20];
 extern uint8_t SetTimeOK;
 

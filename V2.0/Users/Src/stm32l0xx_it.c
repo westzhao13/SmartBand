@@ -41,6 +41,7 @@ uint8_t SetTime;
 uint8_t SendMMA9553L_Data;
 uint8_t SendPulse_Data;
 uint8_t SendSysInfo;
+uint8_t Reboot;
 
 uint8_t TimeBuffer[20];
 uint8_t SetTimeOK;
@@ -154,9 +155,9 @@ void SysTick_Handler(void)
 {
 }*/
 #if (USE_FreeRTOS)
-	//void EXTI4_15_IRQHandler(void)
+	void EXTI4_15_IRQHandler(void)
 	{
-		//HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
+		HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
 	}
 	
 	void RTC_IRQHandler(void)
@@ -224,10 +225,12 @@ void SysTick_Handler(void)
 	{
 		HAL_TIM_IRQHandler(&TimHandle);
 	}
-	void EXTI4_15_IRQHandler(void)
-	{
-		HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
-	}
+
+	/* Pulse Interrupt */
+	//void EXTI0_1_IRQHandler(void)
+//	{
+		//HAL_GPIO_EXTI_IRQHandler(GPIO_0);
+	//}
 	
 	void RTC_IRQHandler(void)
 	{
@@ -265,7 +268,10 @@ void SysTick_Handler(void)
 						
 					case sysinfo: SendSysInfo = 1;
 						break;
-						
+									 
+					case reboot: Reboot = 1;
+						break;
+									 
 					default: {SetTime = 0;SendMMA9553L_Data = 0;SendPulse_Data = 0;SendSysInfo = 0;}
 						break;
 				  }
@@ -291,7 +297,24 @@ void SysTick_Handler(void)
 		HAL_NVIC_ClearPendingIRQ(USART1_IRQn);
 	}	
 
+  /**
+  * @brief  This function handles TIM interrupt request.
+  * @param  None
+  * @retval None
+  */
+	void TIM2_IRQHandler(void)
+	{
+		HAL_TIM_IRQHandler(&TimHandle2);
+
+	}
+
+
+
+
 #endif
+
+
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
 

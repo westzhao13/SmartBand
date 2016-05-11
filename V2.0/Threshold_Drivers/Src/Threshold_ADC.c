@@ -33,7 +33,7 @@ void Threshold_ADC_Init(void)
 
     /**Configure for the selected ADC regular channel to be converted. 
     */
-  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Channel = ADC_CHANNEL_10;
   HAL_ADC_ConfigChannel(&AdcHandle, &sConfig);
 }
 
@@ -53,7 +53,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
   
   /*##-1- Enable peripherals and GPIO Clocks #################################*/
   /* Enable GPIO clock ****************************************/
-  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   /* ADC1 Periph clock enable */
   __HAL_RCC_ADC1_CLK_ENABLE();
   
@@ -62,7 +62,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
   GPIO_InitStruct.Pin = GPIO_PIN_0;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
 /**
@@ -88,7 +88,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
     /**ADC GPIO Configuration    
     PA0-WKUP     ------> ADC_IN0 
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_0);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_0);
 
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 

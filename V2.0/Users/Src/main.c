@@ -67,10 +67,8 @@ void MotionSenser_Thread(void * pvParameters);
   * @param  None
   * @retval None
   */
-  uint8_t Rxdata;
 int main(void)
 {
-
   /* STM32L0xx HAL library initialization:
        - Configure the Flash prefetch, Flash preread and Buffer caches
        - Systick timer is configured by default as source of time base, but user 
@@ -120,15 +118,17 @@ int main(void)
 		{	
 			if(Time20ms_Flag)
 			{
-				Menu(DisPlayRTC,DisPlayStep,DisPlayHeartBeat,DisPlayTimeFigure,DisPlayAuthor);
-				//MPU_Get_Gyroscope();
-				//MPU_Get_Accelerometer();
-				//GyroData.x = (MPU_Read_Byte(MPU_GYRO_XOUTH_REG) << 8) + MPU_Read_Byte(MPU_GYRO_XOUTL_REG);
-				//GyroData.y = (MPU_Read_Byte(MPU_GYRO_YOUTH_REG) << 8) + MPU_Read_Byte(MPU_GYRO_YOUTL_REG);
-				//GyroData.z = (MPU_Read_Byte(MPU_GYRO_ZOUTH_REG) << 8) + MPU_Read_Byte(MPU_GYRO_ZOUTL_REG);
-				//Data_Send_Senser(GyroData.x,GyroData.y,GyroData.z,AccData.x,AccData.y,AccData.z,0);
-				Threshold_BlE_Deal();
+				if(SetTime == false)
+					Menu(DisPlayRTC,DisPlayStep,DisPlayHeartBeat,DisPlayTimeFigure,DisPlayAuthor);
+				//OLED_Printf(3,(uint8_t*)"By WestZhao");
 				Time20ms_Flag = 0;
+			}
+
+			if(Time50ms_Flag)
+			{
+			    Threshold_BlE_Deal();
+				User_AD_Deal();
+				Time50ms_Flag = 0;
 			}
 			
 			if(Time100ms_Flag)
@@ -139,11 +139,9 @@ int main(void)
 			
 			if(Time500ms_Flag)
 			{
-			  Threshold_RTC_TimeShow();
-				Time500ms_Flag = 0;
+			   Threshold_RTC_TimeShow();
+				 Time500ms_Flag = 0;
 			}
-			
-		 
 			
 		}
 #endif
@@ -239,20 +237,39 @@ static void Key_Action(void * pvParameters)
   */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	static portBASE_TYPE xHigherPriorityTaskWoken;
-	xHigherPriorityTaskWoken = pdFALSE;
-	
-	xSemaphoreGiveFromISR( xSemaphore, &xHigherPriorityTaskWoken );
-	
-	if( xHigherPriorityTaskWoken == pdTRUE )
+	//static uint16_t cnt = 0;
+	if(HAL_GPIO_ReadPin(GPIOC,GPIO_13) == GPIO_PIN_RESET)
 	{
-		//给出信号量以使得等待此信号量的任务解除阻塞，如果解除阻塞的任务的优先级高于当前任务的优先级
-		//强制进行一次任务切换，以确保中断直接返回到解除阻塞的任务(优先级更高)
-		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+		static portBASE_TYPE xHigherPriorityTaskWoken;
+		xHigherPriorityTaskWoken = pdFALSE;
+		
+		xSemaphoreGiveFromISR( xSemaphore, &xHigherPriorityTaskWoken );
+		
+		if( xHigherPriorityTaskWoken == pdTRUE )
+		{
+			//给出信号量以使得等待此信号量的任务解除阻塞，如果解除阻塞的任务的优先级高于当前任务的优先级
+			//强制进行一次任务切换，以确保中断直接返回到解除阻塞的任务(优先级更高)
+			portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+		}
+		
+		//直接调用以下函数即可完成 给出信号量 并且 上下文切换 的工作
+		//osSemaphoreRelease(xSemaphore);
 	}
-	
-	//直接调用以下函数即可完成 给出信号量 并且 上下文切换 的工作
-	//osSemaphoreRelease(xSemaphore);
+
+	//pulse
+	#if 0
+	if(HAL_GPIO_ReadPin(GPIOA,GPIO_0) == GPIO_PIN_RESET)
+	{
+		cnt++;
+		if( true == Time1s_Flag)
+		{
+			HeartBeat = cnt;
+			cnt = 0;
+			Time1s_Flag = false;
+		}
+		printf(" Pulse Interrupt ! \r\n");
+	}
+	#endif
 }
 
 
@@ -276,3 +293,4 @@ void assert_failed(uint8_t* file, uint32_t line)
   }
 }
 #endif
+

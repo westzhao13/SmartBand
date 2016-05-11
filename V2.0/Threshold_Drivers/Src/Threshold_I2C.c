@@ -25,6 +25,7 @@ uint8_t Threshold_I2C_Init(void)
 	else
 	{
 		printf("HardWare I2C init OK! \r\n");
+		OLED_Printf(1,(uint8_t*)"IIC Loading");
 	}
 	
 	HAL_I2CEx_AnalogFilter_Config(&I2CxHandle, I2C_ANALOGFILTER_ENABLED);

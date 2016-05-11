@@ -55,5 +55,5 @@
 	uint8_t Threshold_GPIO_Toggle(GPIO_TypeDef *GPIOx,uint32_t pin);
 	GPIO_PinState Threshold_ReadPin(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin);
 	uint8_t Threshold_WritePin(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin,GPIO_PinState PinState);
-	
+	void Threshold_GPIO_EXTI_Init(GPIO_TypeDef  *GPIOx,uint32_t Pin);
 	#endif

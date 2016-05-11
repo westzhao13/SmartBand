@@ -33,7 +33,7 @@ uint8_t Threshold_RTC_Init(uint8_t year,uint8_t month,uint8_t date,uint8_t week,
     /* Initialization Error */
     Error_Handler();
   }
-
+	
 	/*##-1- Configure the Tamper peripheral ####################################*/
   /* Configure Tamper registers */
   /* RTC Tamper configured as follow:
@@ -108,6 +108,11 @@ void Threshold_RTC_TimeShow(void)
 			/* Display time Format : hh:mm:ss */
 			printf("20%.2d %.2d %.2d WeekDay:%d \r\n",sdatestructureget.Year, sdatestructureget.Month, 
 						sdatestructureget.Date,sdatestructureget.WeekDay);
+			
+			OLED_Clear();
+			OLED_Write_String(6,2,(uint8_t*)"SET Time OK");
+			OLED_Printf_Delay(500);
+			OLED_Clear();
 		}
 }		
 
@@ -217,3 +222,5 @@ static void Error_Handler(void)
 {
 	
 }
+
+

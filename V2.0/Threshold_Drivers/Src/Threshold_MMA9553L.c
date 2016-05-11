@@ -5,15 +5,15 @@ MMA9553_CMD  m_cmddata;
 extern uint8_t MMA9553L_I2C_OK;
 uint8_t MMA9553L_OK;
 
-#define MMA_Power_On()    (GPIOA->BSRR = GPIO_15)
-#define MMA_Power_Off()   (GPIOA->BRR = GPIO_15)
+#define MMA_Power_Off()    (GPIOA->BSRR = GPIO_15)
+#define MMA_Power_On()   (GPIOA->BRR = GPIO_15)
 
 
 
 static void Delay_US(void)
 {
 	 int n;
-   for(n=0; n<500; n++);
+   for(n=0; n<5000; n++);
 }
 
 /******************************************************************** 
@@ -121,16 +121,30 @@ uint8_t MMA9553L_Init(void)
 		Delay_US();
 		Delay_US();
 		Delay_US();
-		
+		Delay_US();
+		Delay_US();
+		Delay_US();
 		/*add your code here*/   //电源复位
 		MMA_Power_Off(); //off
 		
 		Delay_US();
 		Delay_US();
 		Delay_US();
-		
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		Delay_US();
 		MMA_Power_On(); //on
 		
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		Delay_US();
+		Delay_US();
 		Delay_US();
 		Delay_US();
 		Delay_US();
@@ -144,7 +158,7 @@ uint8_t MMA9553L_Init(void)
 		pedometer_init();//执行第一次
 
 		printf("---------wait for MMA9553L init------\r\n");
-		
+		OLED_Printf(2,(uint8_t*)"Wait ACCE");
 	}while(MMA9553L_I2C_OK == false);  //I2C检测不正常
 
 	do
@@ -154,6 +168,7 @@ uint8_t MMA9553L_Init(void)
 	}while(MMA9553L_OK == false);
 	
 	printf("---------MMA9553L init success------\r\n");
+	OLED_Printf(3,(uint8_t*)"ACCE Loading");
 	
 	return 1;
 }
@@ -562,3 +577,4 @@ void pedometer_afe_config_read(void)
 /******************************************************************** 
 *          鏂囦欢缁撴潫 
 ********************************************************************/
+

@@ -7,6 +7,8 @@
  
  void ReadPulse(void);
  void sendDataToProcessing(char symbol, int dat );
+ void GPIO_ReadPulse(void);
+ void Threshold_Pulse_Init(void);
  
  #endif
 

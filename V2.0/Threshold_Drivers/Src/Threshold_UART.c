@@ -272,7 +272,10 @@ void Threshold_BlE_Deal(void)
 	uint8_t i;
 	if(true == SetTime)
 	{
-		
+		OLED_Clear();
+		OLED_Printf(2,(uint8_t*)"SETTING TIME");
+		OLED_Printf_Delay(500);
+		OLED_Clear();
 		if(SetTimeOK == true)
 		{
 			RTC_Refresh();
@@ -300,11 +303,23 @@ void Threshold_BlE_Deal(void)
 	if(true == SendSysInfo)
 	{
 		printf("------------------SmartBand V2.0-------------------\r\n");
-		printf("------------------------------HARDWARE------------------------------\r\n");
+		printf("--------HARDWARE---Version--1.0-------Author:WangWeiqi----\r\n");
 		printf("--------CPU: STM32L053R8T6----ACC:MMA9553L------------\r\n");
 		printf("--------SoftWare---Version--2.1-------Author:ZhaoXiang----\r\n");
 		SendSysInfo = false;
 	}
+	
+	if(true == Reboot)
+	{
+		OLED_Clear();
+		OLED_Printf(2,(uint8_t*)"System reboot");
+		OLED_Printf_Delay(500);
+		OLED_Clear();
+		HAL_NVIC_SystemReset();
+		
+		SendSysInfo = false;
+	}
+	
 }
 
 

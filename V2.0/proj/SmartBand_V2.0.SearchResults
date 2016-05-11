@@ -1,3 +1,11 @@
----- USART1_IRQHandler Matches (2 in 2 files) ----
-Stm32l0xx_it.c (h:\smartband(threshold)\smartband\v2.0\users\src):	void USART1_IRQHandler(void)                	//¡ä??¨²1?D??¡¤t??3¨¬D¨°
-Threshold_UART.h (h:\smartband(threshold)\smartband\v2.0\threshold_drivers\inc):#define USARTx_IRQHandler                USART1_IRQHandler
+---- HAL_GPIO_EXTI_Callback Matches (5 in 3 files) ----
+Main.c (h:\smartband(threshold)\smartband\v2.0\users\src):void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+Stm32l0xx_hal_gpio.c (h:\smartband(threshold)\smartband\v2.0\drivers\stm32l0xx_hal_driver\src):    HAL_GPIO_EXTI_Callback(GPIO_Pin);
+Stm32l0xx_hal_gpio.c (h:\smartband(threshold)\smartband\v2.0\drivers\stm32l0xx_hal_driver\src):__weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+Stm32l0xx_hal_gpio.c (h:\smartband(threshold)\smartband\v2.0\drivers\stm32l0xx_hal_driver\src):           the HAL_GPIO_EXTI_Callback could be implemented in the user file
+Stm32l0xx_hal_gpio.h (h:\smartband(threshold)\smartband\v2.0\drivers\stm32l0xx_hal_driver\inc):void          HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+---- HAL_GPIO_EXTI_IRQHandler Matches (4 in 3 files) ----
+Stm32l0xx_hal_gpio.c (h:\smartband(threshold)\smartband\v2.0\drivers\stm32l0xx_hal_driver\src):void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
+Stm32l0xx_hal_gpio.h (h:\smartband(threshold)\smartband\v2.0\drivers\stm32l0xx_hal_driver\inc):void          HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin);
+Stm32l0xx_it.c (h:\smartband(threshold)\smartband\v2.0\users\src):		HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
+Stm32l0xx_it.c (h:\smartband(threshold)\smartband\v2.0\users\src):		HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);

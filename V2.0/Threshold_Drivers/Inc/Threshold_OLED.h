@@ -48,8 +48,6 @@
 #define MAIN_OLED_ROW     1 
 #define MAIN_OLED_COLUMN 128
 
-
-
 /* Function Prototypes */
 
 void OLED_WrDat(unsigned char data);
@@ -67,8 +65,8 @@ void OLED_Write_Num5(unsigned char x,unsigned char y,unsigned int num);
 void Draw_BMP(uint8_t x0,uint8_t y0,uint8_t x1,uint8_t y1,uint8_t bmp[]);
 void Draw_Logo(void);
 void OLED_Clear(void);
-
-
+void OLED_Printf(uint8_t cmd,uint8_t *s);
+void OLED_Printf_Delay(uint16_t x);
 #endif
 
 

@@ -222,13 +222,13 @@
 void OLED_GPIO_Init(void)
 {
 	//SCL
-		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_6,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_6,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_VERY_HIGH);
 	//SDA
-		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_7,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_7,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_VERY_HIGH);
 	//RST
-		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_4,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_4,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_VERY_HIGH);
 	//DC
-		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_5,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+		Threshold_HardWare_GPIO_Init(THRE_GPIOB,GPIO_5,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_VERY_HIGH);
 }
 
 
@@ -624,5 +624,25 @@ void OLED_Write_Num5(unsigned char x,unsigned char y,uint32_t num)
     OLED_Write_Char(x + 3, y, num % 100 / 10);
 		OLED_Write_Char(x + 4, y, num % 10);
 }
+
+void OLED_Printf_Delay(uint16_t x)
+{
+	uint16_t i,j;
+	for(i = 0; i < 10000; i++)
+	{
+		for(j = 0; j< x; j++);
+	}
+}
+void OLED_Printf(uint8_t cmd,uint8_t *s)
+{
+	uint8_t len;
+	len = strlen(s);
+	OLED_Write_String(0,cmd,(uint8_t*)"---");
+	OLED_Write_String(3,cmd,s);
+	OLED_Write_String(len+3,cmd,(uint8_t*)"--...");
+	OLED_Printf_Delay(250);
+	if(cmd == 4) OLED_Clear();
+}
+
 
 

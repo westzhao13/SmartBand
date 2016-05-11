@@ -18,6 +18,12 @@ unsigned char firstBeat = true;        // used to seed rate array so we startup 
 unsigned char secondBeat = false;      // used to seed rate array so we startup with reasonable BPM
 
 uint16_t HeartBeat;
+uint16_t pulse[10] = {0};
+uint16_t HeartBeat_In5S;
+uint16_t HeartBeat_In6S;
+uint16_t HeartBeat_In9S;
+uint16_t HeartBeat_In10S;
+
 /* Private function prototypes -----------------------------------------------*/
 void ReadPulse(void)
 {
@@ -104,4 +110,176 @@ void sendDataToProcessing(char symbol, int dat )
     putchar(symbol);                // symbol prefix tells Processing what type of data is coming
 		printf("%d\r\n",dat);						// the data to send culminating in a carriage return
 }
+
+void GPIO_ReadPulse(void)
+{
+	static uint16_t cnt = 0;
+	static uint8_t State;
+	static uint8_t LastState;
+	
+	LastState = State;
+			
+	State = HAL_GPIO_ReadPin(GPIOA,GPIO_0);
+	
+	if(State != LastState)
+	{
+		
+		cnt++;
+		if( true == Time1s_Flag)
+		{
+			HeartBeat = cnt;
+			//HeartBeat += HeartBeat_In1S;
+			cnt = 0;
+			Time1s_Flag = false;
+		}
+		
+	}
+}
+
+/* Timer handler declaration */
+TIM_HandleTypeDef      TimHandle2;
+
+/* Timer Input Capture Configuration Structure declaration */
+TIM_IC_InitTypeDef     sICConfig;
+
+/* Captured Values */
+uint32_t               uwIC2Value1 = 0;
+uint32_t               uwIC2Value2 = 0;
+uint32_t               uwDiffCapture = 0;
+
+/* Capture index */
+uint16_t               uhCaptureIndex = 0;
+
+/* Frequency Value */
+uint32_t               uwFrequency = 0;
+
+void Threshold_Pulse_Init(void)
+{
+	  /*##-1- Configure the TIM peripheral #######################################*/ 
+	  /* Set TIMx instance */
+	  TimHandle2.Instance = TIM2;
+	 
+	  /* Initialize TIMx peripheral as follow:
+	       + Period = 0xFFFF
+	       + Prescaler = 0
+	       + ClockDivision = 0
+	       + Counter direction = Up
+	  */
+	  TimHandle2.Init.Period        = 0xFFFF;
+	  TimHandle2.Init.Prescaler     = 0;
+	  TimHandle2.Init.ClockDivision = 0;
+	  TimHandle2.Init.CounterMode   = TIM_COUNTERMODE_UP;  
+	  if(HAL_TIM_IC_Init(&TimHandle2) != HAL_OK)
+	  {
+	    /* Initialization Error */
+	    //ErrorHandler();
+	  }
+	  
+	  /*##-2- Configure the Input Capture channel ################################*/ 
+	  /* Configure the Input Capture of channel 1 */
+	  sICConfig.ICPolarity  = TIM_ICPOLARITY_RISING;
+	  sICConfig.ICSelection = TIM_ICSELECTION_DIRECTTI;
+	  sICConfig.ICPrescaler = TIM_ICPSC_DIV1;
+	  sICConfig.ICFilter    = 0;   
+	  if(HAL_TIM_IC_ConfigChannel(&TimHandle2, &sICConfig, TIM_CHANNEL_1) != HAL_OK)
+	  {
+	    /* Configuration Error */
+	    //ErrorHandler();
+	  }
+
+
+     /*##-3- Start the Input Capture in interrupt mode ##########################*/
+	  if(HAL_TIM_IC_Start_IT(&TimHandle2, TIM_CHANNEL_1) != HAL_OK)
+	  {
+	    /* Starting Error */
+	    //ErrorHandler();
+	  }
+}
+
+/**
+  * @brief TIM MSP Initialization 
+  *        This function configures the hardware resources used in this example: 
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration  
+  * @param htim: TIM handle pointer
+  * @retval None
+  */
+void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim)
+{
+  GPIO_InitTypeDef   GPIO_InitStruct;
+ 
+  /*##-1- Enable peripherals and GPIO Clocks #################################*/
+  /* TIM2 Peripheral clock enable */
+  __HAL_RCC_TIM2_CLK_ENABLE();
+    
+  /* Enable GPIO channels Clock */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  
+  /* Configure (TIM2_Channel2) in Alternate function, push-pull and High speed */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF2_TIM2;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*##-2- Configure the NVIC for TIMx #########################################*/
+  /* Set the TIM2 global Interrupt */
+  HAL_NVIC_SetPriority(TIM2_IRQn, 0, 1);
+  
+  /* Enable the TIM2 global Interrupt */
+  HAL_NVIC_EnableIRQ(TIM2_IRQn);
+}
+
+
+/**
+  * @brief  Input Capture callback in non blocking mode 
+  * @param  htim : TIM IC handle
+  * @retval None
+  */
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+	//static uint8_t cnt;
+  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+  {
+    if(uhCaptureIndex == 0)
+    {
+      /* Get the 1st Input Capture value */
+      uwIC2Value1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+      uhCaptureIndex = 1;
+    }
+    else if(uhCaptureIndex == 1)
+    {
+      /* Get the 2nd Input Capture value */
+      uwIC2Value2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1); 
+      
+      /* Capture computation */
+      if (uwIC2Value2 > uwIC2Value1)
+      {
+        uwDiffCapture = (uwIC2Value2 - uwIC2Value1); 
+      }
+      else if (uwIC2Value2 < uwIC2Value1)
+      {
+        uwDiffCapture = ((0xFFFF - uwIC2Value1) + uwIC2Value2) + 1;
+      }
+      else
+      {
+        uwDiffCapture = 0;
+      }
+
+	    
+	  
+      /* uwFrequency computation
+      TIM2 counter clock = RCC_Clocks.HCLK_Frequency */      
+      uwFrequency = HAL_RCC_GetHCLKFreq()/ (uwDiffCapture + 1);
+      uhCaptureIndex = 0;
+			//HeartBeat = 60000 / (uwFrequency * uwDiffCapture);
+    }
+      HeartBeat_In5S++;
+			HeartBeat_In6S++;
+			HeartBeat_In9S++;
+			HeartBeat_In10S++;
+  }
+}
+
 

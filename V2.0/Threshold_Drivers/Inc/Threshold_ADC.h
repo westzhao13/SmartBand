@@ -16,6 +16,10 @@
 #define COMPUTATION_DIGITAL_12BITS_TO_VOLTAGE(ADC_DATA)                        \
   ( (ADC_DATA) * VDD_APPLI / RANGE_12BITS)
 
+#define COMPUTATION_DIGITAL_10BITS_TO_VOLTAGE(ADC_DATA)                        \
+  ( (ADC_DATA) * VDD_APPLI / RANGE_10BITS)
+
+
 /* ## Definition of ADC related resources ################################### */
 /* Definition of ADCx clock resources */
 #define ADCx                            ADC1
@@ -25,12 +29,12 @@
 #define ADCx_RELEASE_RESET()            __HAL_RCC_ADC1_RELEASE_RESET()
 
 /* Definition of ADCx channels */
-#define ADCx_CHANNELa                   ADC_CHANNEL_4
+#define ADCx_CHANNELa                   ADC_CHANNEL_10
 
 /* Definition of ADCx channels pins */
-#define ADCx_CHANNELa_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define ADCx_CHANNELa_GPIO_PORT         GPIOA
-#define ADCx_CHANNELa_PIN               GPIO_PIN_4
+#define ADCx_CHANNELa_GPIO_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
+#define ADCx_CHANNELa_GPIO_PORT         GPIOC
+#define ADCx_CHANNELa_PIN               GPIO_PIN_0
 
 /* Definition of ADCx NVIC resources */
 #define ADCx_IRQn                       ADC1_COMP_IRQn
@@ -43,3 +47,4 @@ void Threshold_ADC_Init(void);
 uint16_t ADC_Read(void);
 
 #endif
+

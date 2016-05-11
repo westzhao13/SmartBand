@@ -6,20 +6,20 @@ uint8_t key = 0;
 void KeyInit(void)
 {
 	//Pin C-13
-#if USE_FreeRTOS
+//#if USE_FreeRTOS
 		//按键初始化
-	  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_EXTI);
-#else 
+	 // BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
+//#else 
 	  //查询方法
-		Threshold_HardWare_GPIO_Init(THRE_GPIOC,GPIO_13,GPIO_MODE_INPUT,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
-#endif
+		Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_3,GPIO_MODE_INPUT,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+//#endif
 }
 
 KeyState GetKey(void)
 {
-	if(Threshold_ReadPin(GPIOC,GPIO_13) == 0)
+	if(Threshold_ReadPin(GPIOA,GPIO_3) == 0)
 	{
-		while(Threshold_ReadPin(GPIOC,GPIO_13) == 0)
+		while(Threshold_ReadPin(GPIOA,GPIO_3) == 0)
 		{
 			//return NotPress;
 		}
@@ -99,34 +99,37 @@ void DisPlayRTC(void)
 
 void DisPlayStep(void)
 {
-	OLED_Write_String(0,0,(uint8_t *)"Step ");
-	OLED_Write_Num4(5,0,m_status.StepCount);
+	OLED_Write_String(6,2,(uint8_t *)"Step ");
+	OLED_Write_Num4(10,2,m_status.StepCount);
 	
-	OLED_Write_String(0,1,(uint8_t *)"Distance ");
-	OLED_Write_Num4(9,1,m_status.Distance);
-	OLED_Write_String(13,1,(uint8_t *)"m");
+	//OLED_Write_String(0,1,(uint8_t *)"Distance ");
+	//OLED_Write_Num4(9,1,m_status.Distance);
+	//OLED_Write_String(13,1,(uint8_t *)"m");
 	
-	OLED_Write_String(0,2,(uint8_t *)"Calory ");
-	OLED_Write_Num4(7,2,m_status.Calories);
-	OLED_Write_String(11,2,(uint8_t *)"J"); 
+	//OLED_Write_String(0,2,(uint8_t *)"Calory ");
+	//OLED_Write_Num4(7,2,m_status.Calories);
+	//OLED_Write_String(11,2,(uint8_t *)"J"); 
 }
 
 void DisPlayHeartBeat(void)
 {
-	OLED_Write_String(0,0,(uint8_t *)"HeartBeat ");
-	OLED_Write_Num4(9,0,HeartBeat);
+	OLED_Write_String(3,2,(uint8_t *)"Distance ");
+	OLED_Write_Num4(12,2,m_status.Distance);
+	OLED_Write_String(16,2,(uint8_t *)"m");
+	
 }
 
 void DisPlayTimeFigure(void)
 {
-	OLED_Write_String(0,2,(uint8_t *)"HeartBeat ");
-	OLED_Write_Num4(9,2,HeartBeat);
+	OLED_Write_String(4,2,(uint8_t *)"Calory ");
+	OLED_Write_Num4(11,2,m_status.Calories);
+	OLED_Write_String(15,2,(uint8_t *)"J");
 }
 
 void DisPlayAuthor(void)
 {
-	OLED_Write_String(0,3,(uint8_t *)"HeartBeat ");
-	OLED_Write_Num4(9,3,HeartBeat);
+	OLED_Write_String(3,2,(uint8_t *)"HeartBeat ");
+	OLED_Write_Num4(12,2,HeartBeat);
 }
 
 

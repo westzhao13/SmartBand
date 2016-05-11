@@ -97,4 +97,18 @@ uint8_t Threshold_WritePin(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin,GPIO_PinState P
 	return 1;
 }
 
+void Threshold_GPIO_EXTI_Init(GPIO_TypeDef  *GPIOx,uint32_t Pin)
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
+	/* Configure Button pin as input with External interrupt */
+    GPIO_InitStruct.Pin = Pin;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+    HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
+    
+    /* Enable and set Button EXTI Interrupt to the lowest priority */
+    HAL_NVIC_SetPriority((IRQn_Type)EXTI0_1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ((IRQn_Type)EXTI0_1_IRQn);
+}
+
 
