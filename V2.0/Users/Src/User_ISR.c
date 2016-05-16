@@ -40,7 +40,7 @@ void Threshold_TIM6_ISR(void)
 {
 	/* add your code here */
 	//HAL_NVIC_DisableIRQ(TIM6_IRQn);
-    Threshold_GPIO_Toggle(GPIOA,GPIO_2);
+    //Threshold_GPIO_Toggle(GPIOA,GPIO_2);
 	
 	if(++Time20ms>=2)
 	{
@@ -80,6 +80,10 @@ void Threshold_TIM6_ISR(void)
 	{
 		Time5s_Flag = 1;
 		pulse[0] = HeartBeat_In5S * 12;
+		if((pulse[0] < 120) && (pulse[0] > 40))
+		{
+			HeartBeat = pulse[0];
+		}
 		HeartBeat_In5S = 0;
 		Time5s = 0;
 	}
@@ -108,7 +112,7 @@ void Threshold_TIM6_ISR(void)
 		
 		if(((pulse[3] + pulse[2] + pulse[1] + pulse[0])/4) < 120 &&  ((pulse[3] + pulse[2] + pulse[1] + pulse[0])/4) > 40)
 		{
-				HeartBeat = (pulse[3] + pulse[2] + pulse[1] + pulse[0])/4;
+				//HeartBeat = (pulse[3] + pulse[2] + pulse[1] + pulse[0])/4;
 		}
 		
 		Time10s = 0;

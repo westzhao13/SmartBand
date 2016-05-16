@@ -3,6 +3,14 @@
 
 #include "main.h"
 
+#define LED_GPIOx  GPIOA
+#define LED_Pin    GPIO_2
+
+#define LED_Off()  (GPIOA->BSRR = LED_Pin)
+#define LED_On() (GPIOA->BRR = LED_Pin)	
+
+
+
 extern TIM_HandleTypeDef      TimHandle2;
 extern TIM_HandleTypeDef    TimHandle;
 extern I2C_HandleTypeDef    I2CxHandle;
@@ -93,6 +101,9 @@ extern uint8_t SendSysInfo;
 extern uint8_t Reboot;
 extern uint8_t TimeBuffer[20];
 extern uint8_t SetTimeOK;
+
+extern uint16_t KeyTime;
+extern uint8_t OLED_OFF;
 
 
 #endif

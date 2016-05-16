@@ -225,23 +225,23 @@ uint8_t RTC_SetTimeDataConvert(uint8_t data)
 	 {
 		 d = data;
 	 }
-	 else if(data >10 && data < 20)
+	 else if(data >= 10 && data < 20)
 	 {
 		 d  = data + 6;
 	 }
-	 else if(data > 20 && data < 30)
+	 else if(data >= 20 && data < 30)
 	 {
 	 	d = data + 12;
      }
-	 else if(data > 30 && data < 40)
+	 else if(data >= 30 && data < 40)
 	 {
 	 	d = data + 18;
 	 }
-	 else if(data > 40 && data < 50)
+	 else if(data >= 40 && data < 50)
 	 {
 	 	d = data + 24;
 	 }
-	 else if(data > 50 && data < 60)
+	 else if(data >= 50 && data < 60)
 	 {
 	 	d = data + 30;
 	 }
@@ -253,6 +253,7 @@ void RTC_Refresh(void)
 {
 	
 	 uint8_t year,month,day,week,hour,minute,second;
+	 uint8_t EEPROMData[7];
 	 year =   RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[0])  * 10 + ASCII_To_Dec(TimeBuffer[1]));
 	 month =  RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[2])  * 10 + ASCII_To_Dec(TimeBuffer[3]));
 	 day =    RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[4])  * 10 + ASCII_To_Dec(TimeBuffer[5]));
@@ -261,10 +262,19 @@ void RTC_Refresh(void)
 	 minute = RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[10]) * 10 + ASCII_To_Dec(TimeBuffer[11]));
 	 second = RTC_SetTimeDataConvert(ASCII_To_Dec(TimeBuffer[12]) * 10 + ASCII_To_Dec(TimeBuffer[13]));
 	 
+	 EEPROMData[0] = year;
+	 EEPROMData[1] = month;
+	 EEPROMData[2] = day;
+	 EEPROMData[3] = week;
+	 EEPROMData[4] = hour;
+	 EEPROMData[5] = minute;
+	 EEPROMData[6] = second;
 	 
 	 Threshold_RTC_Init(year,month,day,week,hour,minute,second);
 	 
-	
+	 /*EEPROMµÄĞ´Èë*/
+	 EEPROM_ErasePages(0,16);
+	 EEPROM_Write(0,EEPROMData,sizeof(EEPROMData));
 }
 
 void Threshold_BlE_Deal(void)

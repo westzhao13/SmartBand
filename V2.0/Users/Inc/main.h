@@ -55,6 +55,8 @@
 #include "Threshold_OLED.h"
 #include "MMA_9553L_Driver.h"
 #include "Threshold_PulseSensor.h"
+#include "Threshold_EEPROM.h"
+
 
 
 #include "User.h"
@@ -92,6 +94,24 @@ typedef enum
 
 
 #define SetTimeNUM 7
+
+typedef struct
+{
+	
+	uint16_t Step[10];
+	uint16_t Calory[10];
+	uint16_t Distance[10];
+	
+}MMA9553LTypeDef;
+
+typedef struct
+{
+	
+	uint8_t heart[10];
+	MMA9553LTypeDef MMA9553LData;
+	
+}BandTypeDef;
+
 
 /* Exported types ------------------------------------------------------------*/
 

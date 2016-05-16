@@ -22,12 +22,6 @@
 
 /**************** End of Device Config *****************/
 
-#define XY_12864
-//#define XY_12832
-
-#define SmallChar
-//#define LargeChar
-
 #define  X_WIDTH         128
 #define  Y_WIDTH         64
 #define  XLevelL		     0x00
@@ -57,11 +51,17 @@ void OLED_Clear(void);
 void OLED_Delay_ms(unsigned int ms);
 void OLED_Init(void);        
 void OLED_Write_Char(unsigned char x,unsigned char y,unsigned char c);
+void OLED_Write_Char_Large(unsigned char x,unsigned char y,unsigned char c);
 void OLED_Write_String(unsigned char x,unsigned char y,unsigned char *s);
+void OLED_Write_String_Large(unsigned char x,unsigned char y,unsigned char *s);
 void OLED_Write_Num2(unsigned char x,unsigned char y,unsigned int num);
+void OLED_Write_Num2_Large(unsigned char x,unsigned char y,unsigned int num);
 void OLED_Write_Num3(unsigned char x,unsigned char y,unsigned int num);
+void OLED_Write_Num3_Large(unsigned char x,unsigned char y,unsigned int num);
 void OLED_Write_Num4(unsigned char x,unsigned char y,unsigned int num);
+void OLED_Write_Num4_Large(unsigned char x,unsigned char y,unsigned int num);
 void OLED_Write_Num5(unsigned char x,unsigned char y,unsigned int num);
+void OLED_Write_Num5_Large(unsigned char x,unsigned char y,unsigned int num);
 void Draw_BMP(uint8_t x0,uint8_t y0,uint8_t x1,uint8_t y1,uint8_t bmp[]);
 void Draw_Logo(void);
 void OLED_Clear(void);

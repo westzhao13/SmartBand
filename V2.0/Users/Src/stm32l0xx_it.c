@@ -155,14 +155,14 @@ void SysTick_Handler(void)
 {
 }*/
 #if (USE_FreeRTOS)
-	void EXTI4_15_IRQHandler(void)
+	void EXTI2_3_IRQHandler(void)
 	{
 		HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
 	}
 	
 	void RTC_IRQHandler(void)
 	{
-		HAL_RTCEx_TamperTimeStampIRQHandler(&RtcHandle);
+		//HAL_RTCEx_TamperTimeStampIRQHandler(&RtcHandle);
 		//TamperStatus = SET;
 	}
 	void USART1_IRQHandler(void)                	//¡ä??¨²1?D??¡¤t??3¨¬D¨°
@@ -195,7 +195,10 @@ void SysTick_Handler(void)
 						
 					case sysinfo: SendSysInfo = 1;
 						break;
-						
+									 
+					case reboot: Reboot = 1;
+						break;
+									 
 					default: {SetTime = 0;SendMMA9553L_Data = 0;SendPulse_Data = 0;SendSysInfo = 0;}
 						break;
 				  }
@@ -218,8 +221,14 @@ void SysTick_Handler(void)
 			  #endif
 			  
 		} 
-		HAL_NVIC_ClearPendingIRQ(USART2_IRQn);
+		HAL_NVIC_ClearPendingIRQ(USART1_IRQn);
 	}	
+	
+	void TIM2_IRQHandler(void)
+	{
+		HAL_TIM_IRQHandler(&TimHandle2);
+
+	}
 #else
 	void TIM6_IRQHandler(void)
 	{

@@ -275,6 +275,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
       uhCaptureIndex = 0;
 			//HeartBeat = 60000 / (uwFrequency * uwDiffCapture);
     }
+	//LED_On();
       HeartBeat_In5S++;
 			HeartBeat_In6S++;
 			HeartBeat_In9S++;

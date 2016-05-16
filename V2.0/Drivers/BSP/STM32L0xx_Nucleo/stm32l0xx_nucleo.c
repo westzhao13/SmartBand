@@ -264,8 +264,8 @@ void BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
   {
     /* Configure Button pin as input with External interrupt */
     GPIO_InitStruct.Pin = BUTTON_PIN[Button];
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING; 
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING; 
     HAL_GPIO_Init(BUTTON_PORT[Button], &GPIO_InitStruct);
     
     /* Enable and set Button EXTI Interrupt to the lowest priority */

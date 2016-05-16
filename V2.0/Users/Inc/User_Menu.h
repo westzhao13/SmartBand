@@ -77,7 +77,7 @@ void DisPlayStep(void);
 void DisPlayHeartBeat(void);
 void DisPlayTimeFigure(void);
 void DisPlayAuthor(void);
-
+KeyState GetKey(void);
 
 
 

@@ -20,8 +20,102 @@ static void Error_Handler(void);
  uint8_t Threshold_Drivers_Load(void) //load Threshold_Drivers
 {
 	Threshold_USE = 1;
+	uint8_t TimeBuffer[7]= {0};
 	/* Configure the System clock to have a frequency of 2 MHz (Up to 32MHZ possible) */
   	Threshold_SystemClock_Config(System_32Mhz);
+
+	Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_2,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+	LED_On();
+	//Threshold_GPIO_EXTI_Init(GPIOA, 0);
+	//Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_0,GPIO_MODE_INPUT,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
+	//uart
+	Threshold_UART_Init(115200);
+	printf("SmartBand_v2.0------------by westzhao \r\n");
+	LED_Off();
+	//oled
+	OLED_Init();
+	printf("OLED Load Success! \r\n");
+	OLED_Printf(0,(uint8_t*)"OLED Loading");
+	LED_On();
+	//i2c
+	#if defined(Gpio_I2C)
+	
+		Threshold_GpioI2C_Init();
+		printf("Sowftware I2C Load Success! \r\n");
+	
+	#elif defined(Hardware_I2C)
+	
+		Threshold_I2C_Init();
+		//printf("Hardware I2C Load Success! \n");
+	
+	#endif
+	LED_Off();
+	
+	#if 1
+	MMA9553L_Init();
+	#endif
+
+	LED_On();
+	
+	#if 0
+	if(true == MPU6050Init())
+	{
+		
+		printf("MPU6050 Init Success! \r\n");
+	}
+	else
+	{
+		
+		printf("MPU6050 Init Failed! \r\n");
+	}
+	#endif
+	
+	
+	
+	//menu
+	MenuInit();
+	printf("UI Load Success! \r\n");
+	OLED_Printf(4,(uint8_t*)"UI Loading");
+	LED_Off();
+	
+  	//rtc
+	EEPROM_Read(0,TimeBuffer,sizeof(TimeBuffer)); //读取数据
+	Threshold_RTC_Init(TimeBuffer[0],TimeBuffer[1],TimeBuffer[2],TimeBuffer[3],TimeBuffer[4],TimeBuffer[5],TimeBuffer[6]);
+	printf("RTC Load Success! \r\n");
+	OLED_Printf(0,(uint8_t*)"RTC Loading");
+	LED_On();
+
+	//adc
+	Threshold_ADC_Init();
+	printf("ADC Init Success! \n");
+	OLED_Printf(1,(uint8_t*)"ADC Loading");
+	LED_Off();
+	
+	/* Timerbase Init in 10ms*/
+    Threshold_TIM6_Init(10); //10ms
+	printf("Timer Load Success! \r\n");
+    OLED_Printf(2,(uint8_t*)"TimerLoading");
+	LED_On();
+	
+	Threshold_Pulse_Init();
+	OLED_Printf(3,(uint8_t*)"Pulse Loading");
+	LED_Off();
+	
+	OLED_Clear();
+	LED_On();
+	OLED_Write_String_Large(3,1,(uint8_t*)"Hello Band");
+	OLED_Printf_Delay(500);
+	
+	OLED_Clear();
+	LED_Off();
+	return 1;
+}
+
+uint8_t BSP_Init(void)
+{
+	Threshold_USE = 1;
+	/* Configure the System clock to have a frequency of 2 MHz (Up to 32MHZ possible) */
+  Threshold_SystemClock_Config(System_32Mhz);
 
 	Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_2,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_HIGH);
 	//Threshold_GPIO_EXTI_Init(GPIOA, 0);
@@ -79,13 +173,13 @@ static void Error_Handler(void);
 	Threshold_ADC_Init();
 	printf("ADC Init Success! \n");
 	OLED_Printf(1,(uint8_t*)"ADC Loading");
-	/* Timerbase Init in 10ms*/
-    Threshold_TIM6_Init(10); //10ms
-	printf("Timer Load Success! \r\n");
-    OLED_Printf(2,(uint8_t*)"TimerLoading");
+	///* Timerbase Init in 10ms*/
+  //Threshold_TIM6_Init(10); //10ms
+	//printf("Timer Load Success! \r\n");
+  //OLED_Printf(2,(uint8_t*)"TimerLoading");
 	
 	Threshold_Pulse_Init();
-	OLED_Printf(3,(uint8_t*)"Pulse Loading");
+	OLED_Printf(2,(uint8_t*)"Pulse Loading");
 	
 	OLED_Clear();
 	
@@ -93,44 +187,6 @@ static void Error_Handler(void);
 	OLED_Printf_Delay(500);
 	
 	OLED_Clear();
-	return 1;
-}
-
-uint8_t BSP_Init(void)
-{
-	Threshold_USE = 1;
-	
-  /* Configure the System clock to 32 MHz */
-    Threshold_SystemClock_Config(System_32Mhz);
-	
-	Threshold_UART_Init(115200);//串口初始化
-	printf("SmartBand_v2.0------------by westzhao \r\n");
-	
-	OLED_Init(); //OLED初始化
-	printf("OELD Init success! \r\n");
-	MenuInit();  //menu初始化
-	printf("UI Init success! \r\n");
-	//LED灯初始化
-    Threshold_HardWare_GPIO_Init(THRE_GPIOA,GPIO_2,GPIO_MODE_OUTPUT_PP,GPIO_PULLUP,GPIO_SPEED_FREQ_VERY_HIGH);
-	//RTC初始化
-	Threshold_RTC_Init(0x16,0x02,0x018,0x4,0x19,0x04,0x00);
-	printf("RTC Init success! \r\n");
-	
-	//i2c
-	#if defined(Gpio_I2C)
-	
-		Threshold_GpioI2C_Init();
-		printf("Sowftware I2C Load Success! \r\n");
-	
-	#elif defined(Hardware_I2C)
-	
-		Threshold_I2C_Init();
-		//printf("Hardware I2C Load Success! \n");
-	
-	#endif
-	//mma9553l
-	MMA9553L_Init();
-	
 	return 1;
 }
 

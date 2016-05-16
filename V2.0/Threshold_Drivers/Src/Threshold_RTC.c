@@ -96,11 +96,19 @@ RTC_DateTypeDef sdatestructureget;
 RTC_TimeTypeDef stimestructureget;
 void Threshold_RTC_TimeShow(void)
 {
+		uint8_t Buffer[4] = {0};
+		
+	  static uint8_t lastHour = 0;
+	
+		lastHour = stimestructureget.Hours;
+	
 	  /* Get the RTC current Time */
 	  HAL_RTC_GetTime(&RtcHandle, &stimestructureget, RTC_FORMAT_BIN);
 	  /* Get the RTC current Date */
 	  HAL_RTC_GetDate(&RtcHandle, &sdatestructureget, RTC_FORMAT_BIN);
-
+		
+		
+	
 		if(true == SetTimeOK)
 		{
 			/* Display time Format : hh:mm:ss */
@@ -111,8 +119,21 @@ void Threshold_RTC_TimeShow(void)
 			
 			OLED_Clear();
 			OLED_Write_String(6,2,(uint8_t*)"SET Time OK");
+			LED_On();
 			OLED_Printf_Delay(500);
 			OLED_Clear();
+		}
+		
+		/*固定时间点每个小时记录一次 进行一次数据写入EEPROM*/
+		if(stimestructureget.Hours != lastHour) //一小时到了
+		{
+			*(Buffer+0) = m_status.Speed;
+			*(Buffer+1) = m_status.Calories;
+			*(Buffer+2) = m_status.Distance;
+			*(Buffer+3) = HeartBeat;
+			/*EEPROM的写入*/
+		  EEPROM_ErasePages(17,21);
+		  EEPROM_Write(10,Buffer,sizeof(Buffer));
 		}
 }		
 

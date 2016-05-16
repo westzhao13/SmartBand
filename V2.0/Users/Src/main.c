@@ -29,7 +29,7 @@
   * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
   * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  * OR TORT (INCLUDING NEGLIGENCE OR OTHER WISE) ARISING IN ANY WAY OUT OF THE USE
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
@@ -55,12 +55,14 @@ typedef enum
 osThreadId Thread1_Handle,Thread2_Handle;
 osSemaphoreId osSemaphore;
 xSemaphoreHandle xSemaphore;
+BandTypeDef BandDataInEEPROM;
 
 /* Private function prototypes -----------------------------------------------*/
-static void Key_Action(void * pvParameters);
+void Key_Action(void * pvParameters);
 void Menu_Thread(void * pvParameters);
 void RTC_Thread(void * pvParameters);
 void MotionSenser_Thread(void * pvParameters);
+void BLE_Thread(void * pvParameters);
 
 /**
   * @brief  Main program
@@ -80,37 +82,39 @@ int main(void)
      */
 #if (USE_FreeRTOS)
 	
-	//官方库的加载
-	HAL_Init();
+	 //官方库的加载
+	 HAL_Init();
 	
-	//板级驱动的加载
-    BSP_Init();
+	 //板级驱动的加载
+   BSP_Init();
 	
-	//创建一个信号量用于中断之间的任务切换
-	vSemaphoreCreateBinary( xSemaphore );
+	 //创建一个信号量用于中断之间的任务切换
+	 vSemaphoreCreateBinary( xSemaphore );
 
-	//任务的创建
-	xTaskCreate( Key_Action, "Key_Action", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+3, NULL );
+	 //任务的创建
+	 xTaskCreate( Key_Action, "Key_Action", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+3, NULL );
 	
-	xTaskCreate( Menu_Thread, "Menu_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+2, NULL );
+	 xTaskCreate( Menu_Thread, "Menu_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+2, NULL );
 	
-	xTaskCreate( MotionSenser_Thread, "MotionSenser_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal, NULL );
+	 xTaskCreate( MotionSenser_Thread, "MotionSenser_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+1, NULL );
 	
-  	xTaskCreate( RTC_Thread, "RTC_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+1, NULL );
+   xTaskCreate( RTC_Thread, "RTC_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+1, NULL );
+
+	 xTaskCreate( BLE_Thread, "BLE_Thread", configMINIMAL_STACK_SIZE, NULL, osPriorityNormal+3, NULL );
    
 	/* Start scheduler */
-    vTaskStartScheduler();//osKernelStart();
+   vTaskStartScheduler();//osKernelStart();
 
     /* We should never get here as control is now taken by the scheduler */
-    for (;;)
-	{
-		printf("error! \n");
-	}
+   for (;;)
+	 {
+		 printf("error! \n");
+	 }
 
 	
 #else
 
-	    HAL_Init();
+        HAL_Init();
 		HAL_Delay(500);
 		Threshold_Drivers_Load(); //Load Threshold Drivers
 			
@@ -118,9 +122,21 @@ int main(void)
 		{	
 			if(Time20ms_Flag)
 			{
-				if(SetTime == false)
+				if(SetTime == false && OLED_OFF == false)
+				{
 					Menu(DisPlayRTC,DisPlayStep,DisPlayHeartBeat,DisPlayTimeFigure,DisPlayAuthor);
-				//OLED_Printf(3,(uint8_t*)"By WestZhao");
+				}
+				else if(OLED_OFF == true)
+				{
+						LED_Off();
+						if(GetKey() == Press) // SCAN OLED ON
+						{
+							
+							OLED_OFF = false;
+							KeyTime = 0;
+						}
+						OLED_Clear();
+				}
 				Time20ms_Flag = 0;
 			}
 
@@ -128,6 +144,7 @@ int main(void)
 			{
 			    Threshold_BlE_Deal();
 				User_AD_Deal();
+				
 				Time50ms_Flag = 0;
 			}
 			
@@ -139,8 +156,13 @@ int main(void)
 			
 			if(Time500ms_Flag)
 			{
-			   Threshold_RTC_TimeShow();
-				 Time500ms_Flag = 0;
+			    Threshold_RTC_TimeShow();
+			    Time500ms_Flag = 0;
+			}
+			
+			if(Time1_Minute_Flag)
+			{
+				Time1_Minute_Flag = 0;
 			}
 			
 		}
@@ -158,10 +180,10 @@ void Menu_Thread(void * pvParameters)
 	
 	for(;;)
 	{
-		BSP_LED_On(LED2);
+		Threshold_GPIO_Toggle(GPIOA,GPIO_2);
 		printf(pcPrint);
 		Menu(DisPlayRTC,DisPlayStep,DisPlayHeartBeat,DisPlayTimeFigure,DisPlayAuthor);
-		vTaskDelayUntil( &xLastWakeTime, ( 20 / portTICK_RATE_MS ) );//50ms运行一次
+		vTaskDelayUntil( &xLastWakeTime, ( 20 / portTICK_RATE_MS ) );//20ms运行一次
 	}
 }
 
@@ -176,10 +198,10 @@ void RTC_Thread(void * pvParameters)
 	
 	for(;;)
 	{
-		BSP_LED_Off(LED2);
+		Threshold_GPIO_Toggle(GPIOA,GPIO_2);
 		printf(pcPrint);
 		Threshold_RTC_TimeShow();
-		vTaskDelayUntil( &xLastWakeTime, ( 500 / portTICK_RATE_MS ) );//10ms运行一次
+		vTaskDelayUntil( &xLastWakeTime, ( 500 / portTICK_RATE_MS ) );//500ms运行一次
 	}
 }
 
@@ -194,19 +216,39 @@ void MotionSenser_Thread(void * pvParameters)
 	
 	for(;;)
 	{
-		BSP_LED_Toggle(LED2);
+		Threshold_GPIO_Toggle(GPIOA,GPIO_2);
 		printf(pcPrint);
 		pedometer_main();
-		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );//10ms运行一次
+		vTaskDelayUntil( &xLastWakeTime, ( 100 / portTICK_RATE_MS ) );//100ms运行一次
 	}
 }
+
+//任务4
+void BLE_Thread(void * pvParameters)
+{
+	const char *pcPrint = "This is BLE Thread \r\n";
+	//准确的时间延时，用于周期运行
+	portTickType xLastWakeTime;
+	/*初始化xLastWakeTime,之后会在vTaskDelayUntil()中更新*/
+	xLastWakeTime = xTaskGetTickCount();
+	
+	for(;;)
+	{
+		Threshold_GPIO_Toggle(GPIOA,GPIO_2);
+		printf(pcPrint);
+		Threshold_BlE_Deal();
+		User_AD_Deal();
+		vTaskDelayUntil( &xLastWakeTime, ( 200 / portTICK_RATE_MS ) );//200ms运行一次
+	}
+}
+
 
 /**
   * @brief  vHandleTask
   * @param  argument: 延时处理的任务(阻塞的任务)，当收到信号量以后，解除阻塞，并且进行上下文的切换，使该任务的优先级达到最高并运行之。
   * @retval None
   */
-static void Key_Action(void * pvParameters)
+void Key_Action(void * pvParameters)
 {
   for (;;)
   {
@@ -238,7 +280,7 @@ static void Key_Action(void * pvParameters)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	//static uint16_t cnt = 0;
-	if(HAL_GPIO_ReadPin(GPIOC,GPIO_13) == GPIO_PIN_RESET)
+	//if(HAL_GPIO_ReadPin(GPIOC,GPIO_13) == GPIO_PIN_RESET)
 	{
 		static portBASE_TYPE xHigherPriorityTaskWoken;
 		xHigherPriorityTaskWoken = pdFALSE;
@@ -255,21 +297,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		//直接调用以下函数即可完成 给出信号量 并且 上下文切换 的工作
 		//osSemaphoreRelease(xSemaphore);
 	}
-
-	//pulse
-	#if 0
-	if(HAL_GPIO_ReadPin(GPIOA,GPIO_0) == GPIO_PIN_RESET)
-	{
-		cnt++;
-		if( true == Time1s_Flag)
-		{
-			HeartBeat = cnt;
-			cnt = 0;
-			Time1s_Flag = false;
-		}
-		printf(" Pulse Interrupt ! \r\n");
-	}
-	#endif
 }
 
 
